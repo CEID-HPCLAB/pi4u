@@ -1,0 +1,43 @@
+Pi4U — Authors and Contributors
+==============================
+
+CURRENT MAINTENANCE AND DEVELOPMENT
+
+Panagiotis Hadjidoukas
+Main developer and maintainer
+CEID-HPCLAB, University of Patras, Greece
+
+Repository: https://github.com/CEID-HPCLAB/pi4u
+Support: https://github.com/CEID-HPCLAB/pi4u/issues
+
+
+ORIGINAL DEVELOPMENT
+
+Pi4U was originally developed at the Computational Science
+and Engineering Laboratory (CSELAB), ETH Zurich, Switzerland.
+
+Affiliations below refer to the original development period.
+
+P. Hadjidoukas       Computational Science, ETH Zurich
+P. Angelikopoulos    Computational Science, ETH Zurich
+C. Papadimitriou     University of Thessaly
+P. Koumoutsakos      Computational Science, ETH Zurich
+L. Kulakova          Computational Science, ETH Zurich
+G. Arampatzis        Computational Science, ETH Zurich
+
+Additional contributors:
+
+F. Zeindler          ETH Zurich (Bachelor thesis)
+D. Melidis           ETH Zurich (Lab rotation)
+T. Vogels            ETH Zurich (HPCSE II project)
+M. Baranidharan      ETH Zurich (HPCSE II project)
+S. Wu                Computational Science, ETH Zurich
+
+
+CONTINUATION
+
+Development is being resumed independently at CEID-HPCLAB,
+University of Patras, under the direction of Panagiotis
+Hadjidoukas.
+
+Original authorship and copyright notices are preserved.

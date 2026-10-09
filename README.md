@@ -6,7 +6,7 @@ Pi4U (Π4U) is a framework for Bayesian inference, uncertainty quantification, a
 
 Pi4U is designed for workflows in which repeated model evaluations dominate the computational cost: calibrating simulation parameters, exploring posterior distributions, searching for optimal designs, and estimating rare-event probabilities. Models can be integrated directly or coupled through external programs.
 
-This repository is the home of the Pi4U continuation at **CEID-HPCLAB, University of Patras**, led by **Panagiotis Hadjidoukas**, the original framework's main developer.
+This repository is the home of the Pi4U continuation at **CEID-HPCLAB, University of Patras**, led by **Panagiotis Hadjidoukas**, the original framework's main software developer.
 
 ## Why Pi4U?
 
@@ -68,7 +68,7 @@ For an example of connecting an external Python model, see [`coupling/simple_mod
 
 ## Project history and continuation
 
-Pi4U was originally developed at the Computational Science and Engineering Laboratory (CSELAB), ETH Zurich, with Panagiotis Hadjidoukas as its main developer and contributions from the collaborators listed in [`AUTHORS`](AUTHORS). The [original repository](https://github.com/cselab/pi4u) records that development history.
+Pi4U was originally developed at the Computational Science and Engineering Laboratory (CSELAB), ETH Zurich, with Panagiotis Hadjidoukas as its main software developer and contributions from the collaborators listed in [`AUTHORS`](AUTHORS). The [original repository](https://github.com/cselab/pi4u) records that development history.
 
 Development is being resumed independently at CEID-HPCLAB, University of Patras. This continuation builds on the original code and preserves its authorship, acknowledgments, and license notices. References to ETH Zurich and CSELAB describe the project's origins; the continuation is maintained by the University of Patras group.
 
