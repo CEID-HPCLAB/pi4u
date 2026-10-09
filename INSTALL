@@ -1,186 +1,237 @@
-I. SOFTWARE COMPONENTS
+# Pi4U: installation and example runs
 
-You will find the following software packages:
+This guide describes how to build Pi4U with the separately maintained [Torc-Lite runtime](https://github.com/CEID-HPCLAB/torc_lite). Install Torc-Lite first, then build the Pi4U engines you need.
 
-- torc_lite: a tasking library that allows us to write platform-independent code
-- pndl: parallel numerical differentiation library, built on top of torc_lite
-- engines: the UQ framework built on top of torc_lite. 
+The commands below assume a Linux/POSIX environment and a Bash-compatible shell. They use a user-owned installation prefix and require no administrator privileges once the prerequisites are available.
 
+## 1. Prerequisites
 
-II. PREREQUISITES
-- An MPI implementation must be installed on your system (preferably with full thread safety)
-- GSL (http://www.gnu.org/software/gsl/) is required by some engines and must be installed on your system
+Install the following packages through your system package manager, or load the corresponding modules on your HPC system:
 
+| Dependency | Used for |
+| --- | --- |
+| Git and GNU Make | Retrieving and building the code |
+| C and C++ compilers | Pi4U engines and Torc-Lite |
+| Fortran compiler | TORC Fortran support and PNDL |
+| MPI implementation with C, C++, and Fortran wrappers | TORC-based execution; examples use `mpicc`, `mpic++`, and `mpif90` |
+| GNU Scientific Library (GSL), including development headers | TMCMC, ABC-SubSim, DRAM, subset simulation, and differentiation tools |
+| Autoconf, Automake, and associated build tools | Regenerating Autotools files when needed; required for the PNDL source checkout described below |
+| gnuplot (optional) | Sample visualization |
 
-III. INSTALLATION STEPS
+Use the same MPI implementation and compatible compilers when building Torc-Lite, Pi4U, and PNDL. For standards-compliant Torc-Lite execution, MPI must provide `MPI_THREAD_SERIALIZED` or `MPI_THREAD_MULTIPLE`; see the [Torc-Lite documentation](https://github.com/CEID-HPCLAB/torc_lite) for details.
 
-1) First we start with torc_lite. We assume that the MPI compiler is named mpicc.
-	cd torc_lite
-	./configure CC=mpicc --prefix=$HOME/usr/torc
-	make; make install
-	export PATH=$HOME/usr/torc/bin:$PATH
+## 2. Install Torc-Lite
 
-   If configure reports missing files, you will need to execute the autoreconf command (autoreconf) before executing ./configure 
+Choose a parent directory for the two source checkouts, then run:
 
-   In $HOME/usr/torc/bin there are two files (torc_cflags, torc_libs) that facilitate the development of torc-based programs.
-   That's why we have added this directory to the PATH environment variable using the export (bash) command. 
- 
-   After finishing this step, you must be able to run successfully at least one of the demo examples, available in torc/examples
+```bash
+git clone https://github.com/CEID-HPCLAB/torc_lite.git
+cd torc_lite
 
-2) We then proceed with the compilation of the various engines (algorithms) of our Uncertainty Quantification and Optimization framework.
-   For example, to build the code that implements the TMCMC algorithm:
+export TORC_PREFIX="$HOME/usr/torc"
+./configure CC=mpicc F77=mpif90 --prefix="$TORC_PREFIX"
+make
+make install
 
-	cd inference/TMCMC
-	make 
+export PATH="$TORC_PREFIX/bin:$PATH"
+```
 
-   If there are compilation issues then some directories in Makefile might need to be revised.
-   For example, the exact location of the GSL library must be specificed.
-   Moreover on some platforms, the MPI compiler can be named differently (e.g. CC=cc on Piz Daint).
+`TORC_PREFIX` is an example installation location; choose another user-writable directory if preferred. If `configure` or generated build files are missing, run `autoreconf -fi` before configuring. Wrapper names vary by MPI installation; substitute the appropriate names on your system.
 
-   The following compilation options are supported:
-	- make use_omp=1		# builds the OpenMP version
-	- make use_torc=1		# builds the TORC-based version 
-	- make use_omp=0 use_torc=0	# builds the serial version
-	- make				# default option is use_omp=0
+Check that the installed helper scripts are available:
 
+```bash
+command -v torc_cflags
+command -v torc_libs
+torc_cflags
+torc_libs
+```
 
-IV. TESTING
+Pi4U Makefiles use these scripts to obtain the TORC include and linker flags. Restore the `PATH` setting in every new shell or batch job that builds Pi4U.
 
-1) inference/TMCMC
+Build and run a TORC demo from the Torc-Lite root directory:
 
-   The TMCMC sampling algorithm
+```bash
+make -C demo
+export TORC_WORKERS=2
+mpirun -np 2 ./demo/masterslave
+```
 
-a) build engine_tmcmc
+Here, `-np 2` selects two MPI processes and `TORC_WORKERS=2` selects two TORC workers per process. TORC also uses communication threads. Allocate sufficient CPU resources, and use your site's MPI launcher and process-binding settings on a cluster.
 
-	cd inference/TMCMC
-	make
+If the loader cannot find a TORC shared library after installation, add the directory containing that library to the runtime library search path. For the example prefix, this is typically:
 
-b) Run the engine
-	./engine_tmcmc
+```bash
+export LD_LIBRARY_PATH="$TORC_PREFIX/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+```
 
-   By default, this runs TMCMC for the rosenbrock function in 2D, as defined in fitfun.c 
-   This is expected to run and produce some output files (curgen_db_000.txt, curgen_db_001.txt, ...)
+Check the installation layout; some systems use `lib64`. This setting is unnecessary when TORC is linked statically.
 
-   The output files can be visualized with the display_gen tool, available in the display directory, using the following command:
-	./display_gen curgen_db 5 2
-	5: number of the last generation (curgen_db_000.txt to curgen_db_005.txt will be displayed)
-	2: problem dimension
+## 3. Retrieve Pi4U
 
-    The runtime options for this engine can be set in the configuration file tmcmc.par
+Return to the parent directory containing the Torc-Lite checkout:
 
-2) singleopt/CMAES
+```bash
+cd ..
+git clone https://github.com/CEID-HPCLAB/pi4u.git
+cd pi4u
+export PI4U_ROOT="$PWD"
+```
 
-   The CMAES stochastic optimization algorithm
+Pi4U and Torc-Lite are separate repositories. Pi4U's TORC-based builds use the installed runtime through `torc_cflags` and `torc_libs`.
 
-a) Build the engine_cmaes
+## 4. Build and run TMCMC
 
-	cd singleopt/CMAES
-	make
+```bash
+cd "$PI4U_ROOT/inference/TMCMC"
+make use_torc=1 use_omp=0
 
-b) Run the engine
-	./engine_cmaes
+export TORC_WORKERS=2
+mpirun -np 2 ./engine_tmcmc
+```
 
-   Optimization of the rosenbrock function in 2D.
-   More information about the generated output files can be found in the documentation of CMAES.
+Run the executable from its engine directory so that its configuration files are found. The supplied model in `fitfun.c` is a two-dimensional Rosenbrock example. Edit `tmcmc.par` for algorithm settings and `fitfun.c` to integrate another model.
 
-3) rare/subset
+The run produces generation files such as `curgen_db_000.txt`, `curgen_db_001.txt`, and subsequent generations.
 
-   Subset simulation 
+TMCMC also supports the following builds:
 
-a) Build the two engines
+| Execution mode | Build command | Run command |
+| --- | --- | --- |
+| TORC/MPI | `make use_torc=1 use_omp=0` | `mpirun -np 2 ./engine_tmcmc` |
+| OpenMP | `make use_torc=0 use_omp=1` | `OMP_NUM_THREADS=4 ./engine_tmcmc` |
+| Serial | `make use_torc=0 use_omp=0` | `./engine_tmcmc` |
 
-	cd rare/subset
-	make
+Run `make clean` before switching execution modes or changing compiler flags, because existing targets may otherwise be reused. In the inherited TMCMC Makefile, plain `make` builds the serial version.
 
-b) Run engine_ss1
-	./engine_ss1
+## 5. Other inference and optimization engines
 
-   Subset simulation for predefined levels
-   This is expected to run and produce some output files (samples_000.txt etc)
+Build each engine from its own directory. The following commands refer to the current source layout; execution options are specific to each Makefile.
 
-   The output files can be displayed with the display_gen tool, using the following command:
-	./display_gen samples 8 2
-	8: number of the last generation (samples_000.txt to samples_008.txt will be displayed)
-	2: problem dimension
+| Component | Directory relative to the Pi4U root | Build command |
+| --- | --- | --- |
+| CMA-ES | `singleopt/cmaes` | `make use_torc=1` |
+| AMaLGaM | `singleopt/AMaLGaM` | `make` |
+| NSGA-II | `multiobj/nsga2` | `make use_torc=1 use_omp=0` |
+| ABC-SubSim | `inference/ABC_SubSim` | `make use_torc=1` |
+| DRAM, sequential | `inference/DRAM` | `make` |
+| Subset simulation | `rare/subset` | `make` |
 
-   The runtime options for this engine can be set in the configuration file subset.par
+AMaLGaM's default target builds both serial and TORC executables. Subset simulation uses TORC directly, without a `use_torc` switch. The DRAM executables run sequentially.
 
-c) Run engine_ss2
+### CMA-ES
 
-	./engine_ss2 
+```bash
+cd "$PI4U_ROOT/singleopt/cmaes"
+make use_torc=1
+mpirun -np 2 ./engine_cmaes
+```
 
-   Same as before but for subset simulation with adaptive levels
+Model evaluations are defined in `fitfun.c`. Consult `cmaes_initials.par` and the other CMA-ES configuration files for settings. The TORC build also produces the experimental asynchronous executable `engine_cmaes_async`.
 
+### Subset simulation
 
-4) Numerical differentiation
+```bash
+cd "$PI4U_ROOT/rare/subset"
+make
+mpirun -np 2 ./engine_ss1
+```
 
-a) Build the parallel numerical differentiation library (PNDL).
+`engine_ss1` uses predefined levels. To run the adaptive-level version instead:
 
-	cd derivatives/pndl
-	./configure CC=mpicc F90=mpif90 
-	make
+```bash
+mpirun -np 2 ./engine_ss2
+```
 
-   A README file with more detailed instructions is available along with the source code of PNDL. 
+Settings are provided in `subset.par`. Output includes sample files such as `samples_000.txt`. The two examples may write to the same filenames; preserve outputs before running the next example.
 
-b) Build the tools 
+### ABC-SubSim
 
-	cd derivatives/tools
-	make
+```bash
+cd "$PI4U_ROOT/inference/ABC_SubSim"
+make use_torc=1
+```
 
-c) Run the tools
+The resulting executable is `abc_subsim_torc.exe`. It requires command-line parameters, including population size and stopping criteria. See [`README-ABC.txt`](inference/ABC_SubSim/README-ABC.txt) for the argument list and instructions for editing `fitfun.cpp` and `problem.h`.
 
-	./fd_grad
-	./fd_deriv
-	./sa_deriv
+## 6. Numerical differentiation with PNDL
 
-   fd_grad: Calculation of the most suitable differentiation step per dimension using gradients and Romberg extrapolation   
-   fd_deriv: Calculation of the gradient vector and Hessian matrix using PNDL 
-   sa_deriv: Stochastic approximation of the Hessian matrix (experimental code)
+PNDL requires TORC and MPI Fortran support. The inherited build contains paths to a bundled `torc_lite` directory. The commands below override those paths for the library build and avoid building the legacy PNDL test programs, whose Makefiles also contain bundled-runtime paths.
 
-   Configuration file for all tools: grad.par
+```bash
+cd "$PI4U_ROOT/derivatives/pndl"
+autoreconf -fi
+./configure CC=mpicc F77=mpif90 --prefix="$HOME/usr/pndl"
 
-5) inference/abc-subsim
+make -C src AM_FFLAGS="$(torc_cflags) -I." \
+            AM_CFLAGS="$(torc_cflags) -I."
+```
 
-   ABC-SUBSIM
+Use `F77` here: PNDL's configure script detects a Fortran 77 compiler through `AC_PROG_F77`. An MPI wrapper such as `mpif90` can compile the fixed-form Fortran sources.
 
-   Please check the README-ABC.txt file in the corresponding folder
+Build the differentiation tools:
 
+```bash
+cd "$PI4U_ROOT/derivatives/tools"
+make MPIF90=mpif90
+```
 
-V) VISUALIZATION
+Their Makefile links directly to `../pndl/src/libpndl.a`, so installing PNDL is not required for these tools. Run them from `derivatives/tools`, where `grad.par` supplies their configuration:
 
-   The display_gen tool, available in the display directority,  can visualize 2D slices of multidimensional data using gnuplot. 
+```bash
+mpirun -np 2 ./fd_grad
+mpirun -np 2 ./fd_deriv
+mpirun -np 2 ./sa_deriv
+```
 
-   To build it:
-	cd display
-	make
+- `fd_grad`: differentiation-step selection using gradients and Romberg extrapolation.
+- `fd_deriv`: gradient and Hessian calculation through PNDL.
+- `sa_deriv`: experimental stochastic approximation of the Hessian.
 
-   The syntax can invoked as follows:
-	./display_gen <datafile> <last gen> <dimension> [var1] [var2]
+For a permanent build-system update, replace the bundled TORC paths in PNDL's `src/Makefile.am` and `test/Makefile.am` with installed-runtime flags, then regenerate the Autotools files. Building the PNDL tests additionally requires updating their TORC include and linker flags.
 
-    - The full name of the file is in the form: <datafile>_<gen>.txt, where gen = 000, 001, ..., <last gen>
-    - <dimension> is the number of parameters. This means that the datafile has <dimension>+1 columns, the last containing the result of the function evaluation
-    - [var1] and [var2] are optional arguments that specify the indices of the two parameters that will be displayed
-	
-    Example:
-	./display_gen ../inference/TMCMC/curgen_db 4 2 1 2
+## 7. Visualization
 
+Install gnuplot, then build the display tools:
 
-VI) COUPLING WITH EXTERNAL SOFTWARE
+```bash
+cd "$PI4U_ROOT/display"
+make
+```
 
-   The coupling/ folder includes examples that demonstrate how external software can be called within a fitness function (fitfun)
-   and coupled with any of the engines and tools available in the Pi4U framework.
-   External software can include any kind of sequential or parallel code (OpenMP, MPI), 
-   and be implemented in any possible programming language and environment (C/C++, Fortran, Python, Matlab). 
- 	
-Currently the following examples are included:
+The generation viewer accepts:
 
-a) coupling/rosenbrock:
-	A simple example; the Rosenbrock function now runs within the external sequential software.
-	Passing of parameters is performed through the automatically created params.dat file
+```text
+./display_gen <datafile-prefix> <last-generation> <dimension> [var1] [var2]
+```
 
+For example, if a two-dimensional TMCMC run produced generations 000 through 004:
 
-VII) NOTES
+```bash
+./display_gen ../inference/TMCMC/curgen_db 4 2 1 2
+```
 
-Do not hesitate to ask for help and report any problems at:
-- chatzidp AT ethz.ch
-- garampat AT ethz.ch
+Set the last-generation argument to a generation that actually exists. Generation filenames follow `<prefix>_<generation>.txt`, with zero-padded generation numbers. The parameter columns are followed by a model-evaluation column.
+
+## 8. Coupling external models
+
+The [`coupling`](coupling/) directory contains examples for calling external programs from a model-evaluation function. These include a Rosenbrock example and a [simple external Python model](coupling/simple_model/README.md).
+
+Follow each example's instructions to build its driver, prepare the model files, and configure parameter exchange. External models can use their own programming language and execution environment. Python and any model-specific dependencies are required only for examples that use them.
+
+## 9. Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| `torc_cflags` or `torc_libs` not found | Install Torc-Lite and add its installation `bin` directory to `PATH`. |
+| `torc.h` or `torcf.h` not found | Check the include path printed by `torc_cflags` and the installed headers. For PNDL, use the overrides in Section 6. |
+| GSL headers or libraries not found | Install the GSL development package or load its module; add the correct include and linker paths to the engine Makefile. |
+| `mpicc`, `mpic++`, or `mpif90` not found | Load the MPI environment or substitute your installation's wrapper names. |
+| TORC library not found at runtime | Check the installed library directory and runtime library search path. |
+| Configuration files not found | Run from the engine/example directory containing its configuration files. |
+| Changing build options has no effect | Run `make clean` before rebuilding. |
+| Autotools files missing or outdated | Run `autoreconf -fi` in the relevant library directory; inspect any reported compatibility errors. |
+
+Older Makefiles may require compiler-specific adjustments on modern systems. For nonstandard MPI wrappers, override the variables actually used by the engine, such as `CC`, `CPP`, `LD`, or `MPIF90`, or edit its Makefile. For GSL, preserve the existing flags when adding installation paths.
+
+For support, open an [issue](https://github.com/CEID-HPCLAB/pi4u/issues) with the component, compiler and MPI versions, exact build/run command, relevant configuration, and error output.
