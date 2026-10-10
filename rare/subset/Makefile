@@ -2,11 +2,11 @@ CPP = mpic++
 
 CFLAGS = -O3 -Wall
 
-CFLAGS += `torc_cflags` -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
-LDFLAGS += `torc_libs` -lpthread -lm 
+CFLAGS += `torc_cflags` -D_XOPEN_SOURCE=700 -D_BSD_SOURCE `gsl-config --cflags`
+LDFLAGS += `torc_libs` -lm  # -lpthread -lm 
 
 # GSL
-LDFLAGS += -lgsl -lgslcblas
+LDFLAGS += `gsl-config --libs` # -lgsl -lgslcblas
 
 # PRIMARY
 

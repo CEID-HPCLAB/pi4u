@@ -15,7 +15,6 @@
 #include <iostream>
 using namespace std;
 #include <mpi.h>
-//#include <omp.h>
 #include <math.h>
 extern "C"
 {
@@ -50,7 +49,7 @@ void read_data()
 		data.upperbound[i] = data.ub;
 	}
 
-	data.MAXTHRESHOLDS = 10;
+	data.MAXTHRESHOLDS = 50;
 	data.threshold = (double *)malloc(data.MAXTHRESHOLDS*sizeof(double));
 	for (i = 0; i < data.MAXTHRESHOLDS; i++) {
 		data.threshold[i] = 0.0;
@@ -249,7 +248,7 @@ void modified_metropolis(double seed[], double *pfseed, int *plevel, int *pN_ste
 	int n = data.Nth;
 	
 	double fleader = fseed;
-	double leader[data.Nth];
+	double *leader = (double *)malloc(data.Nth*sizeof(double));
 	memcpy(leader, seed, data.Nth*sizeof(double));
 	
 //	samples = [seed]
@@ -324,6 +323,7 @@ again:
 		}
 #endif
 	}
+  free(leader);
 }
 
 

@@ -15,15 +15,12 @@
 #include <iostream>
 using namespace std;
 #include <mpi.h>
-//#include <omp.h>
 #include <math.h>
 extern "C"
 {
 #include <torc.h>
-//#include "engine_ss.h"
 }
 #include "engine_ss.h"
-
 
 /**********************************************/
 // PARAMS
@@ -39,7 +36,7 @@ void read_data()
 	/* DEFAULT VALUES */
 	data.N_init = 11000;
 	data.N_seeds = 1000;
-	data.N_steps = 10;
+	data.N_steps = 100;
 
 	data.lb = -6.0;	// Default LB, same for all
 	data.ub = +6.0;	// Default UB, same for all
@@ -52,7 +49,7 @@ void read_data()
 		data.upperbound[i] = data.ub;
 	}
 
-	data.NTHRESHOLDS = 10;
+	data.NTHRESHOLDS = 100;
 	data.threshold = (double *)malloc(data.NTHRESHOLDS*sizeof(double));
 	for (i = 0; i < data.NTHRESHOLDS; i++) {
 		data.threshold[i] = -64.0/pow(2.0, i*1.0);
@@ -60,7 +57,7 @@ void read_data()
 
 	data.logval = 0;
 
-	data.sigma = 0.1; 
+	data.sigma = 0.1;
 	data.seed = 280675;
 	data.iplot = 0;	// gnuplot
 
@@ -258,7 +255,7 @@ void modified_metropolis(double seed[], double *pfseed, int *plevel, int *pN_ste
 	int N_steps = *pN_steps;
 	
 	double fleader = fseed;
-	double leader[data.Nth];
+	double *leader = (double *)malloc(data.Nth*sizeof(double));
 	memcpy(leader, seed, data.Nth*sizeof(double));
 	
 //	samples = [seed]
@@ -323,6 +320,8 @@ again:
 			add_sample(leader, &fleader);
 		}
 	}
+
+  free(leader);
 }
 
 
