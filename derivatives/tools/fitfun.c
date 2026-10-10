@@ -43,6 +43,11 @@ double bvnpdf(double *x, int n) /* bivariate */
 {
 	double P;
 
+	if (n != 2) {
+		fprintf(stderr, "bvnpdf requires dimension 2; received %d\n", n);
+		abort();
+	}
+
 	P = gsl_ran_bivariate_gaussian_pdf(x[0], x[1], 1, 1, 0);
 	return P;
 }
