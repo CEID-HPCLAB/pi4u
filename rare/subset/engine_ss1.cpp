@@ -11,11 +11,15 @@
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
-#include <unistd.h>
+#include <vector>
 #include <iostream>
 using namespace std;
+
 #include <mpi.h>
+#include <unistd.h>
 #include <math.h>
+
+
 extern "C"
 {
 #include <torc.h>
@@ -36,11 +40,11 @@ void read_data()
 	/* DEFAULT VALUES */
 	data.N_init = 11000;
 	data.N_seeds = 1000;
-	data.N_steps = 100;
+	data.N_steps = 10;
 
 	data.lb = -6.0;	// Default LB, same for all
 	data.ub = +6.0;	// Default UB, same for all
- 
+
 	data.lowerbound = (double *)malloc(data.Nth*sizeof(double));
 	data.upperbound = (double *)malloc(data.Nth*sizeof(double));
 
@@ -49,9 +53,10 @@ void read_data()
 		data.upperbound[i] = data.ub;
 	}
 
-	data.NTHRESHOLDS = 100;
+	data.NTHRESHOLDS = 10;
 	data.threshold = (double *)malloc(data.NTHRESHOLDS*sizeof(double));
 	for (i = 0; i < data.NTHRESHOLDS; i++) {
+		//data.threshold[i] = 1 + 0.5*i;
 		data.threshold[i] = -64.0/pow(2.0, i*1.0);
 	}
 
@@ -253,18 +258,20 @@ void modified_metropolis(double seed[], double *pfseed, int *plevel, int *pN_ste
 	double fseed = *pfseed;
 	int level = *plevel;
 	int N_steps = *pN_steps;
-	
+
 	double fleader = fseed;
-	double *leader = (double *)malloc(data.Nth*sizeof(double));
-	memcpy(leader, seed, data.Nth*sizeof(double));
-	
+	//double *leader = (double *)malloc(data.Nth*sizeof(double));
+	std::vector<double> leader(data.Nth);
+	memcpy(leader.data(), seed, data.Nth*sizeof(double));
+
 //	samples = [seed]
-	add_sample(leader, &fleader);
-	
+	add_sample(leader.data(), &fleader);
+
 	for (int i = 0; i < N_steps; i++) {
 		//# Step 1: generate a candidate sample
+		//double xi[data.Nth];	// test point per direction
+		std::vector<double> xi(data.Nth);
 
-		double xi[data.Nth];	// test point per direction
 		for (int index = 0; index < data.Nth; index++) {
 			//# generate xi from 1D uniform
 			double spread = 2.0*data.sigma;
@@ -274,24 +281,29 @@ again:
 				goto again;
 		}
 
-		double fthetaj[data.Nth];	// function value at each test point
+
+		//double fthetaj[data.Nth];	// function value at each test point
+		std::vector<double> fthetaj(data.Nth);
 
 		for (int index = 0; index < data.Nth; index++) {
-			double thetaj[data.Nth];	// test point
+			//double thetaj[data.Nth];	// test point
+			std::vector<double> thetaj(data.Nth);
 
-			memcpy(thetaj, leader, data.Nth*sizeof(double));
+			memcpy(thetaj.data(), leader.data(), data.Nth*sizeof(double));
 			thetaj[index] = xi[index];
 
 			int wid = torc_worker_id();
 			torc_create(wid, (void (*)())taskf, 2,
 					data.Nth, MPI_DOUBLE, CALL_BY_COP,
 					1, MPI_DOUBLE, CALL_BY_RES,
-					thetaj, &fthetaj[index]);
+					thetaj.data(), &fthetaj[index]);
 		}
 		torc_waitall();
 
 		// build the candidate point and compute the function value there
-		double candidate[data.Nth];
+		//double candidate[data.Nth];
+		std::vector<double> candidate(data.Nth);
+
 		for (int index = 0; index < data.Nth; index++) {
 			//# compute the ratio
 			double r, P;
@@ -311,17 +323,16 @@ again:
 				candidate[index] = leader[index];
 			}
 		}
-		double fcandidate = demand(candidate);
+		double fcandidate = demand(candidate.data());
 
 		//# Step 2: accept/reject the candidate
 		if (in_F(fcandidate, level)) {
-			memcpy(leader, candidate, data.Nth*sizeof(double));
+			memcpy(leader.data(), candidate.data(), data.Nth*sizeof(double));
 			fleader = fcandidate;
-			add_sample(leader, &fleader);
+			add_sample(leader.data(), &fleader);
 		}
 	}
 
-  free(leader);
 }
 
 

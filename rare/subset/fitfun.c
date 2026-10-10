@@ -13,6 +13,7 @@ double fitfun(double /*const*/ *x, int N, void *output, int *info)
 	f = 0.0;
 	for (i=0; i<N-1; i++)   /* rosenbrock */
 		f = f + 100.0*pow((x[i+1]-x[i]*x[i]),2) + pow((x[i]-1.0),2);
+	f = -f;
 #endif
 
 #if defined(_USE_RASTRIGIN_)
@@ -21,10 +22,15 @@ double fitfun(double /*const*/ *x, int N, void *output, int *info)
 	f = 0.0;
 	for (i=0; i<N; i++)     /* rastrigin */
 		f = f + pow(x[i],2) + 10.0 - 10.0*cos(2*pi*x[i]);
+
+	f = -f/10.0;
 #endif
 
 #if defined(_USE_SUBSETFUN_)
-	f = 8*exp(-(pow(x[0],2.0)+pow(x[1],2.0))) + 2*exp(-(pow(x[0]-5,2.0)+pow(x[1]-4,2.0))) + 1.0 + (x[0]*x[1])/10.0;
+	//f = 8*exp(-(pow(x[0],2.0)+pow(x[1],2.0))) + 2*exp(-(pow(x[0]-5,2.0)+pow(x[1]-4,2.0))) + 1.0 + (x[0]*x[1])/10.0;
+	const double r1 = x[0]*x[0] + x[1]*x[1];
+	const double r2 = (x[0]-2.0)*(x[0]-2.0) + (x[1]-3.0)*(x[1]-3.0);
+	f = -fmin(r1, r2);
 #endif
 
 	return f;

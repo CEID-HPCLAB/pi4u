@@ -16,19 +16,6 @@
 #include <mpi.h>
 #include <torc.h>
 
-/*
-#ifndef MY_GETTIME
-#define MY_GETTIME
-#include <sys/time.h>
-static double my_gettime()
-{
-	struct timeval t;
-	gettimeofday(&t, NULL);
-	return (double)t.tv_sec + (double)t.tv_usec*1.0E-6;
-}
-#endif
-*/
-
 #include "gsl_headers.h"
 
 typedef struct data_s {
@@ -57,16 +44,9 @@ typedef struct data_s {
 
 } data_t;
 
-
-//typedef struct runinfo_s {
-//} runinfo_t;
-
 extern data_t data;
-//extern runinfo_t runinfo;
-
 
 /*** DATABASES ***/
-
 void db_init();
 void add_seed_task(double s[], double *pfs);
 void add_seed(double s[], double *pfs);
