@@ -24,7 +24,8 @@ auxil.o: auxil.cpp
 	$(CPP) $(CFLAGS) -c auxil.cpp
 
 clean:
-	rm -f engine_ss_fixed engine_ss_adaptive *.o
+	rm -f engine_ss_fixed engine_ss_adaptive *.o 
+	rm -rf engine_ss_fixed.dSYM engine_ss_adaptive.dSYM
 
 clear:
 	rm -rf samples*.txt seeds*.txt Pc.txt
