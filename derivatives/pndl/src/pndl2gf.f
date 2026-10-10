@@ -174,7 +174,7 @@ C  ---------------------------------------------------------------------
 	DIMENSION XX(N), RES(N)
 	include 'torcf.h'
 
-	call torc_task(GRD, 0, 3,
+	call torc_taskf(GRD, 0, 3,
      &	    N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
      &      1, MPI_INTEGER, CALL_BY_VAL,
      &      N, MPI_DOUBLE_PRECISION, CALL_BY_RES,

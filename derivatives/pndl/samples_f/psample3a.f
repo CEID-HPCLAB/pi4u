@@ -14,7 +14,7 @@ c
 
 	call pndl_init()
 	call torc_register_task(pndlg)
-	call torc_init()
+	call torc_initf()
 c   ...
 	x1(1) = 1.0d0
 	x1(2) = 1.1d0
@@ -22,7 +22,7 @@ c   ...
 	n = nn
 
 
-        call torc_task(pndlg, 1, 5,
+        call torc_taskf(pndlg, 1, 5,
      &      1, MPI_INTEGER, CALL_BY_VAD,
      &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
      &      1, MPI_INTEGER, CALL_BY_VAL,
@@ -34,7 +34,7 @@ c   ...
 	x2(2) = 2.1d0
 	iord = 2
 
-        call torc_task(pndlg, 1, 5,
+        call torc_taskf(pndlg, 1, 5,
      &      1, MPI_INTEGER, CALL_BY_VAD,
      &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
      &      1, MPI_INTEGER, CALL_BY_VAL,
@@ -46,7 +46,7 @@ c   ...
 	x3(2) = 3.1d0
 	iord = 2
 
-        call torc_task(pndlg, 1, 5,
+        call torc_taskf(pndlg, 1, 5,
      &      1, MPI_INTEGER, CALL_BY_VAD,
      &      N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
      &      1, MPI_INTEGER, CALL_BY_VAL,

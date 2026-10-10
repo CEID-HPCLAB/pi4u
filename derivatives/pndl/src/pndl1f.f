@@ -175,7 +175,9 @@ C  ---------------------------------------------------------------------
 	DIMENSION XX(N)
 	include 'torcf.h' 
     
-	call torc_task(TASKFUN, 0, 4,
+C	print *, 'MPI_INTEGER = ', MPI_INTEGER
+C	print *, 'MPI_DOUBLE_PRECISION = ', MPI_DOUBLE_PRECISION
+	call torc_taskf(TASKFUN, 0, 4,
      &	    1, MPI_INTEGER, CALL_BY_VAD,
      &	    N, MPI_DOUBLE_PRECISION, CALL_BY_VAL,
      &	    1, MPI_INTEGER, CALL_BY_VAL,

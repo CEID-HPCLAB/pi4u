@@ -1,17 +1,15 @@
-bin_PROGRAMS=pt1 pt2 ptj
+bin_PROGRAMS = pt1 pt2 ptj
 
-AM_CFLAGS = @DEBUG_FLAG@ 
+AM_FFLAGS = @DEBUG_FLAG@ `torc_cflags` -fno-lto
+AM_LDFLAGS = -fno-lto
 
-LLIBS = -L../src -lpndl -L../../../torc_lite/src -ltorc
+LDADD = ../src/libpndl.a `torc_libs`
 
 pt1_SOURCES = pt1.f
-pt1_LDADD =$(LLIBS) 
-pt1_FFLAGS = -I../../../torc_lite/include
+pt1_DEPENDENCIES = ../src/libpndl.a
 
 pt2_SOURCES = pt2.f
-pt2_LDADD = $(LLIBS)
-pt2_FFLAGS = -I../../../torc_lite/include
+pt2_DEPENDENCIES = ../src/libpndl.a
 
 ptj_SOURCES = ptj.f
-ptj_LDADD = $(LLIBS)
-ptj_FFLAGS = -I../../../torc_lite/include
+ptj_DEPENDENCIES = ../src/libpndl.a

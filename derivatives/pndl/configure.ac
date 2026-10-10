@@ -1,6 +1,6 @@
-AC_INIT(pndl, 1.0.0,,pndl)
+AC_INIT([pndl],[1.0.0],[],[pndl])
 AC_CONFIG_AUX_DIR(auxdir)
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 
 
@@ -14,11 +14,11 @@ if test "x${CFLAGS}" = x; then
         noCFLAGS=yes
 fi
 
-AC_CONFIG_HEADER(src/pndl_config.h)
+AC_CONFIG_HEADERS([src/pndl_config.h])
 AC_PROG_CC(mpicc)
 AC_PROG_F77(mpif77)
 AC_PROG_SED
-AC_LANG_C
+AC_LANG([C])
 AC_PROG_CPP
 
 dnl AC_LANG(Fortran 77)
@@ -83,7 +83,7 @@ AC_ARG_WITH(mpilibdir,
 	fi)
 
 AC_ARG_ENABLE(debug,
-	AC_HELP_STRING([--enable-debug], [enable debugging (default:disabled)]),
+	AS_HELP_STRING([--enable-debug],[enable debugging (default:disabled)]),
 	if eval "test x$enable_debug = xyes"; then
 		DEBUGFLAG="-g"
 	else
@@ -130,4 +130,5 @@ else
 fi
 
 
-AC_OUTPUT(Makefile src/Makefile test/Makefile)
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile])
+AC_OUTPUT
