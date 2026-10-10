@@ -39,7 +39,7 @@ typedef struct ss_db_s
 
 
 static ss_db_t samples;
-static ss_db_t seeds; 
+static ss_db_t seeds;
 
 void db_init()
 {
@@ -176,7 +176,7 @@ void permute_seeds(int N)
 		memcpy(tmp_seeds[i], &seeds.entry[perm[i]*(data.Nth+1)], (data.Nth+1)*sizeof(double));
 	}
 	free(perm);
-	
+
 	for (i = 0; i < N; i++) {
 		memcpy(&seeds.entry[i*(data.Nth+1)], tmp_seeds[i], (data.Nth+1)*sizeof(double));
 	}
@@ -191,7 +191,7 @@ int compar_desc(const void* p1, const void* p2)
 	int dir = +1;	// -1: ascending order, +1: descending order
 	double *s1 = (double *) p1;
 	double *s2 = (double *) p2;
-	
+
 	if (s1[data.Nth] < s2[data.Nth]) return dir;
 	if (s1[data.Nth] > s2[data.Nth]) return -dir;
 //	if (s1[data.Nth] == s2[data.Nth]) return 0;
@@ -203,7 +203,7 @@ int compar_asc(const void* p1, const void* p2)
 	int dir = -1;	// -1: ascending order, +1: descending order
 	double *s1 = (double *) p1;
 	double *s2 = (double *) p2;
-	
+
 	if (s1[data.Nth] < s2[data.Nth]) return dir;
 	if (s1[data.Nth] > s2[data.Nth]) return -dir;
 //	if (s1[data.Nth] == s2[data.Nth]) return 0;
@@ -225,7 +225,7 @@ void dump_samples(int step)
 	char fname[256];
 	sprintf(fname, "samples_%03d.txt", step);
 	FILE *fp = fopen(fname, "w");
-	
+
 	for (int i = 0; i < samples.ncount; i++) {
 		for (int k = 0; k < data.Nth; k++) {
 			fprintf(fp, "%lf ", samples.entry[i*(data.Nth+1)+k]);
@@ -240,7 +240,7 @@ void dump_seeds(int step)
 	char fname[256];
 	sprintf(fname, "seeds_%03d.txt", step);
 	FILE *fp = fopen(fname, "w");
-	
+
 	for (int i = 0; i < seeds.ncount; i++) {
 		for (int k = 0; k < data.Nth; k++) {
 			fprintf(fp, "%lf ", seeds.entry[i*(data.Nth+1)+k]);

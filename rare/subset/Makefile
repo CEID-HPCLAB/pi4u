@@ -10,21 +10,21 @@ LDFLAGS += `gsl-config --libs` # -lgsl -lgslcblas
 
 # PRIMARY
 
-TARGETS = engine_ss1 engine_ss2 
+TARGETS = engine_ss_fixed engine_ss_adaptive 
 
 all: $(TARGETS)
 
-engine_ss1: engine_ss1.cpp ss_db.cpp auxil.o fitfun.c
-	$(CPP) $(CFLAGS) -o engine_ss1 engine_ss1.cpp ss_db.cpp auxil.o $(LDFLAGS)
+engine_ss_fixed: engine_ss_fixed.cpp ss_db.cpp auxil.o fitfun.c
+	$(CPP) $(CFLAGS) -o engine_ss_fixed engine_ss_fixed.cpp ss_db.cpp auxil.o $(LDFLAGS)
 
-engine_ss2: engine_ss2.cpp ss_db.cpp auxil.o fitfun.c
-	$(CPP) $(CFLAGS) -o engine_ss2 engine_ss2.cpp ss_db.cpp auxil.o $(LDFLAGS)
+engine_ss_adaptive: engine_ss_adaptive.cpp ss_db.cpp auxil.o fitfun.c
+	$(CPP) $(CFLAGS) -o engine_ss_adaptive engine_ss_adaptive.cpp ss_db.cpp auxil.o $(LDFLAGS)
 
 auxil.o: auxil.cpp
 	$(CPP) $(CFLAGS) -c auxil.cpp
 
 clean:
-	rm -f engine_ss1 engine_ss2 *.o
+	rm -f engine_ss_fixed engine_ss_adaptive *.o
 
 clear:
 	rm -rf samples*.txt seeds*.txt Pc.txt

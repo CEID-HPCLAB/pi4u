@@ -36,8 +36,6 @@ typedef struct data_s {
 
 	double	sigma;
 	int	seed;
-	int	iplot;
-
 
 	double	FACTOR;		// for adaptive subset
 	int	MAXTHRESHOLDS;	//
