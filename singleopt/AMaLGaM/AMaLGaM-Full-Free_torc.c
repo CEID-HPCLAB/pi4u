@@ -28,7 +28,7 @@
  * the years:
  * - Peter A.N. Bosman
  * - Dirk Thierens
- * - Jörn Grahl
+ * - Jarn Grahl
  *
  * This is the most up-to-date literature reference regarding this software:
  *
@@ -37,7 +37,7 @@
  * J. Bacardit, C. Bates Congdon, H.-G. Beyer, M. Birattari, C. Blum,
  * P.A.N. Bosman, D. Corne, C. Cotta, M. Di Penta, B. Doerr, R. Drechsler,
  * M. Ebner, J. Grahl, T. Jansen, J. Knowles, T. Lenaerts, M. Middendorf,
- * J.F. Miller, M. O'Neill, R. Poli, G. Squillero, K. Stanley, T. Stützle
+ * J.F. Miller, M. O'Neill, R. Poli, G. Squillero, K. Stanley, T. Stotzle
  * and J. van Hemert, editors, Proceedings of the Genetic and Evolutionary
  * Computation Conference - GECCO-2009, pages 389-396, ACM Press, New York,
  * New York, 2009. 

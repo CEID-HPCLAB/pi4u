@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include "gnuplot_i.h"
 
-int display = 1;
+int display = 0;
 
 gnuplot_ctrl * g = NULL;
 
@@ -65,7 +65,7 @@ void display_onegen_db_dim(int Gen, int Dim)
 			char using_str[64], title_str[64];
 			sprintf(using_str, "using %d:%d:%d ", i,j,Dim+1);
 			sprintf(title_str, "\"%d_%d_%d\"", Gen,i,j);
-			gnuplot_cmd(g, "set term x11 %d persist title %s", i*Dim+j, title_str);
+//			gnuplot_cmd(g, "set term x11 %d persist title %s", i*Dim+j, title_str);
 #if 1
 			if ((i == 1)&&(j==2))
 				gnuplot_cmd(g, "splot [-20:0][-15:0] \"%s\" %s with points pt 7 palette", fname, using_str);
@@ -185,7 +185,7 @@ void display_curgen_db_single(int Gen, int p1, int p2, int Dim, int NGens)
 	sprintf(using_str, "using %d:%d:%d ", i,j,Dim+1);
 	sprintf(title_str, "\"%d_%d_%d\"", Gen,i,j);
 #if 1
-	gnuplot_cmd(g, "set term x11 %d persist title %s", i*Dim+j, title_str);
+//	gnuplot_cmd(g, "set term x11 %d persist title %s", i*Dim+j, title_str);
 #else
 	gnuplot_cmd(g, "set term x11 %d persist title %s", Gen, title_str);
 #endif
