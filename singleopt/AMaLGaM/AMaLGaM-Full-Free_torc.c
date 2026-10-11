@@ -94,9 +94,9 @@ double installedProblemUpperRangeBound( int index, int dimension );
 short isParameterInRangeBounds( double parameter, int dimension );
 void installedProblemEvaluation( int *pindex, double *parameters, double *objective_value, double *constraint_value, int *info );
 void installedProblemEvaluationWithoutRotation( int index, double *parameters, double *objective_value, double *constraint_value, int *info );
-void rosenbrockFunctionProblemEvaluation( double *parameters, double *objective_value, double *constraint_value, int *info );
-double rosenbrockFunctionLowerRangeBound( int dimension );
-double rosenbrockFunctionUpperRangeBound( int dimension );
+void FunctionProblemEvaluation( double *parameters, double *objective_value, double *constraint_value, int *info );
+double FunctionLowerRangeBound( int dimension );
+double FunctionUpperRangeBound( int dimension );
 void initialize( void );
 void initializeMemory( void );
 void initializeRandomNumberGenerator( void );
@@ -1161,7 +1161,7 @@ double random1DNormalUnit( void )
  */
 char *installedProblemName( int index )
 {
-  return( (char *) "Rosenbrock" );
+  return( (char *) "FitnessFunction" );
 }
 
 /**
@@ -1177,7 +1177,7 @@ int numberOfInstalledProblems( void )
  */
 double installedProblemLowerRangeBound( int index, int dimension )
 {
-  return( rosenbrockFunctionLowerRangeBound( dimension ) );
+  return( FunctionLowerRangeBound( dimension ) );
 }
 
 /**
@@ -1185,7 +1185,7 @@ double installedProblemLowerRangeBound( int index, int dimension )
  */
 double installedProblemUpperRangeBound( int index, int dimension )
 {
-  return( rosenbrockFunctionUpperRangeBound( dimension ) );
+  return( FunctionUpperRangeBound( dimension ) );
 }
 
 /**
@@ -1240,10 +1240,10 @@ void installedProblemEvaluationWithoutRotation( int index, double *parameters, d
   *objective_value  = 0.0;
   *constraint_value = 0.0;
 
-  rosenbrockFunctionProblemEvaluation( parameters, objective_value, constraint_value, info );
+  FunctionProblemEvaluation( parameters, objective_value, constraint_value, info );
 }
 
-void rosenbrockFunctionProblemEvaluation( double *parameters, double *objective_value, double *constraint_value, int *info )
+void FunctionProblemEvaluation( double *parameters, double *objective_value, double *constraint_value, int *info )
 {
 #if defined(RANDOMIZE)
   int    i;
@@ -1263,12 +1263,12 @@ void rosenbrockFunctionProblemEvaluation( double *parameters, double *objective_
 #endif
 }
 
-double rosenbrockFunctionLowerRangeBound( int dimension )
+double FunctionLowerRangeBound( int dimension )
 {
   return( -1e+308 );
 }
 
-double rosenbrockFunctionUpperRangeBound( int dimension )
+double FunctionUpperRangeBound( int dimension )
 {
   return( 1e+308 );
 }
