@@ -25,6 +25,7 @@ display_gen: display_gen.c gnuplot_i.c
 
 clean:
 	rm -f AMaLGaM-Full-Free AMaLGaM-Full-Free_torc AMaLGaM-Full_torc display_gen
+	rm -rf *.dSYM
 
 clear:
 	rm -f *.dat
