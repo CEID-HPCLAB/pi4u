@@ -2,7 +2,7 @@ use_torc?=0
 
 CC=gcc
 CFLAGS=-O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
-LDFLAGS=-lm -lpthread
+LDFLAGS=-lm
 
 ifeq ($(use_torc),1)
 CC = mpicc
@@ -31,6 +31,7 @@ engine_cmaes_async_note:
 .PHONY: clean
 clean:
 	rm -f engine_cmaes engine_cmaes_async *.o
+	rm -rf *.dSYM
 
 .PHONY: clear
 clear:

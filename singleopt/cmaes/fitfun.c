@@ -34,8 +34,8 @@ double fitfun(double /*const*/ *x, int N, void *output, int *info)
 
 #if defined(_USE_CIGTAB_)
 	f = 1e4*x[0]*x[0] + 1e-4*x[1]*x[1];	/* cigtab */
-	for(i = 2; i < N; i++) 
-		f += x[i]*x[i]; 
+	for(i = 2; i < N; i++)
+		f += x[i]*x[i];
 	f= -f;
 #endif
 

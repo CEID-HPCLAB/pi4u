@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Stand-alone plotting module for CMA-ES.
 
 See `plot` and `CMADataLogger`, e.g.::
@@ -325,6 +325,11 @@ class CMADataLogger(BaseDataLogger):
         assert len(self.file_names) == len(self.key_names)
         for i in range(len(self.file_names)):
             fn = filenameprefix + self.file_names[i] + '.dat'
+            # Correlation spectra are optional and absent in c-cmaes logs.
+            if self.file_names[i] == 'axlencorr':
+                import os
+                if not os.path.isfile(fn):
+                    continue
             try:
                 self.__dict__[self.key_names[i]] = _fileToMatrix(fn)
             except:
@@ -336,7 +341,7 @@ class CMADataLogger(BaseDataLogger):
                     self.__dict__[self.key_names[i]].append(
                         self.__dict__[self.key_names[i]][-1])
                 self.__dict__[self.key_names[i]] = \
-                    array(self.__dict__[self.key_names[i]], copy=False)
+                    np.asarray(self.__dict__[self.key_names[i]])
             except:
                 _print_warning('no data for %s' % fn, 'load',
                                'CMADataLogger')
@@ -517,7 +522,7 @@ class CMADataLogger(BaseDataLogger):
         the new value
 
         """
-        if not nameprefix or not isinstance(nameprefix, basestring):
+        if not nameprefix or not isinstance(nameprefix, str):
             raise ValueError('filename prefix must be a nonempty string')
 
         if nameprefix == self.default_prefix:
@@ -592,10 +597,9 @@ class CMADataLogger(BaseDataLogger):
         """
         try:
             # pyplot: prodedural interface for matplotlib
-            from matplotlib.pyplot import figure, subplot, hold, gcf
+            from matplotlib.pyplot import figure, subplot, gcf
         except ImportError:
-            ImportError('could not find matplotlib.pyplot module, function plot() is not available')
-            return
+            raise ImportError('could not import matplotlib.pyplot')
 
         if fig is None:
             fig = 325
@@ -628,9 +632,12 @@ class CMADataLogger(BaseDataLogger):
         # dat.f[:,0]==countiter is monotonous
 
         figure(fig)
+        pyplot.clf()
         finalize = self._finalize_plotting
         self._finalize_plotting = lambda : None
-        self._enter_plotting(fontsize)
+        # Do not create a default full-figure axes before the subplots.
+        self.original_fontsize = pyplot.rcParams['font.size']
+        pyplot.rcParams['font.size'] = fontsize
         self.fighandle = gcf()  # fighandle.number
 
         subplot(2, 2, 1)
@@ -644,7 +651,7 @@ class CMADataLogger(BaseDataLogger):
         # spectrum of correlation matrix
         if 11 < 3 and hasattr(dat, 'corrspec'):
             figure(fig+10000)
-            hold(False)
+            pyplot.cla()
             self.plot_correlations(iabscissa)
         figure(fig)
 
@@ -701,8 +708,7 @@ class CMADataLogger(BaseDataLogger):
             # pyplot: prodedural interface for matplotlib
             from  matplotlib.pyplot import figure, subplot, gcf
         except ImportError:
-            ImportError('could not find matplotlib.pyplot module, function plot() is not available')
-            return
+            raise ImportError('could not import matplotlib.pyplot')
 
         if fig is None:
             fig = 426
@@ -728,7 +734,9 @@ class CMADataLogger(BaseDataLogger):
         # TODO: if abscissa==0 plot in chunks, ie loop over subsets where dat.f[:,0]==countiter is monotonous
 
         figure(fig)
-        self._enter_plotting(fontsize)
+        # Do not create a default full-figure axes before the subplots.
+        self.original_fontsize = pyplot.rcParams['font.size']
+        pyplot.rcParams['font.size'] = fontsize
         self.fighandle = gcf()  # fighandle.number
 
         if 11 < 3:
@@ -790,7 +798,7 @@ class CMADataLogger(BaseDataLogger):
         dat = self
         self._enter_plotting()
         pyplot.semilogy(dat.D[:, iabscissa], dat.D[:, 5:], '-b')
-        pyplot.hold(True)
+        pass  # Matplotlib now retains existing artists by default
         pyplot.grid(True)
         ax = array(pyplot.axis())
         # ax[1] = max(minxend, ax[1])
@@ -822,7 +830,7 @@ class CMADataLogger(BaseDataLogger):
 
             dat.std[-1, iabscissa] = minxend  # TODO: should be ax[1]
             pyplot.semilogy(dat.std[:, iabscissa], dat.std[:, 5:], '-')
-            pyplot.hold(True)
+            pass  # Matplotlib now retains existing artists by default
             ax = array(pyplot.axis())
 
             yy = np.logspace(np.log10(ax[2]), np.log10(ax[3]), dat.std.shape[1] - 5)
@@ -835,7 +843,7 @@ class CMADataLogger(BaseDataLogger):
                         array([ax[2] * (1 + 1e-6), ax[3] / (1 + 1e-6)]),
                         # array([np.min(dat.std[:, 5:]), np.max(dat.std[:, 5:])]),
                         'k-')
-            pyplot.hold(True)
+            pass  # Matplotlib now retains existing artists by default
             # plot([dat.std[-1, iabscissa], ax[1]], [dat.std[-1,5:], yy[idx2]], 'k-') # line from last data point
             for i in range(len(idx)):
                 # text(ax[1], yy[i], ' '+str(idx[i]))
@@ -843,7 +851,7 @@ class CMADataLogger(BaseDataLogger):
                             ' ' + str(i))
         else:
             pyplot.semilogy(dat.std[:, iabscissa], dat.std[:, 5:], '-')
-        pyplot.hold(True)
+        pass  # Matplotlib now retains existing artists by default
         pyplot.grid(True)
         pyplot.title(r'Standard Deviations $\times$ $\sigma^{-1}$ in All Coordinates')
         # pyplot.xticks(xticklocs)
@@ -874,10 +882,10 @@ class CMADataLogger(BaseDataLogger):
         y = self.corrspec[:, 6:]  # principle axes
         ys = self.corrspec[:, :6]  # "special" values
 
-        from matplotlib.pyplot import semilogy, hold, text, grid, axis, title
+        from matplotlib.pyplot import semilogy, text, grid, axis, title
         self._enter_plotting()
         semilogy(x, y, '-c')
-        hold(True)
+        pass  # Matplotlib now retains existing artists by default
         semilogy(x[:], np.max(y, 1) / np.min(y, 1), '-r')
         text(x[-1], np.max(y[-1, :]) / np.min(y[-1, :]), 'axis ratio')
         if ys is not None:
@@ -907,7 +915,7 @@ class CMADataLogger(BaseDataLogger):
         :See: `plot()`
 
         """
-        from matplotlib.pyplot import semilogy, hold, grid, \
+        from matplotlib.pyplot import semilogy, grid, \
             axis, title, text
         fontsize = pyplot.rcParams['font.size']
 
@@ -923,24 +931,24 @@ class CMADataLogger(BaseDataLogger):
                 dat.f[0, i] = dat.f[1, i]
         minfit = np.nanmin(dat.f[:, 5])
         dfit = dat.f[:, 5] - minfit  # why not using idx?
-        dfit[dfit < 1e-98] = np.NaN
+        dfit[dfit < 1e-98] = np.nan
 
         self._enter_plotting()
         if dat.f.shape[1] > 7:
             # semilogy(dat.f[:, iabscissa], abs(dat.f[:,[6, 7, 10, 12]])+foffset,'-k')
             semilogy(dat.f[:, iabscissa], abs(dat.f[:, [6, 7]]) + foffset, '-k')
-            hold(True)
+            pass  # Matplotlib now retains existing artists by default
 
         # (larger indices): additional fitness data, for example constraints values
         if dat.f.shape[1] > 8:
             # dd = abs(dat.f[:,7:]) + 10*foffset
-            # dd = np.where(dat.f[:,7:]==0, np.NaN, dd) # cannot be
+            # dd = np.where(dat.f[:,7:]==0, np.nan, dd) # cannot be
             semilogy(dat.f[:, iabscissa], np.abs(dat.f[:, 8:]) + 10 * foffset, 'y')
-            hold(True)
+            pass  # Matplotlib now retains existing artists by default
 
         idx = np.where(dat.f[:, 5] > 1e-98)[0]  # positive values
         semilogy(dat.f[idx, iabscissa], dat.f[idx, 5] + foffset, '.b')
-        hold(True)
+        pass  # Matplotlib now retains existing artists by default
         grid(True)
 
 
@@ -964,7 +972,7 @@ class CMADataLogger(BaseDataLogger):
         for istart in start_idx:
             istop = stop_idx[stop_idx > istart]
             istop = istop[0] if len(istop) else 0
-            idx = xrange(istart, istop if istop else dat.f.shape[0])
+            idx = range(istart, istop if istop else dat.f.shape[0])
             if len(idx) > 1:
                 semilogy(dat.f[idx, iabscissa], abs(dat.f[idx, 5]) + foffset,
                         'm')  # , markersize=5
@@ -1047,7 +1055,7 @@ class CMADataLogger(BaseDataLogger):
         # ax[1] = max(minxend, ax[1])
         axis(ax)
         text(ax[0] + 0.01, ax[2],  # 10**(log10(ax[2])+0.05*(log10(ax[3])-log10(ax[2]))),
-             '.min($f$)=' + repr(minfit))
+             'min($f$)=' + format(float(minfit), '.4g'))
              #'.f_recent=' + repr(dat.f[-1, 5]))
 
         # title('abs(f) (blue), f-min(f) (cyan), Sigma (green), Axis Ratio (red)')
@@ -1064,12 +1072,13 @@ class CMADataLogger(BaseDataLogger):
         # interactive_status = matplotlib.is_interactive()
         self.original_fontsize = pyplot.rcParams['font.size']
         pyplot.rcParams['font.size'] = fontsize
-        pyplot.hold(False)  # opens a figure window, if non exists
+        pyplot.cla()  # opens a figure window, if non exists
         pyplot.ioff()
     def _finalize_plotting(self):
         pyplot.draw()  # update "screen"
-        pyplot.ion()
-        pyplot.show()
+        # The command-line entry point owns the GUI event loop.
+        if pyplot.isinteractive():
+            pyplot.show(block=False)
         pyplot.rcParams['font.size'] = self.original_fontsize
     def _xlabel(self, iabscissa=1):
         pyplot.xlabel('iterations' if iabscissa == 0
@@ -1085,7 +1094,7 @@ class CMADataLogger(BaseDataLogger):
                            'plot_xrecent or plot_mean', 'plot_x',
                            'CMADataLogger')
             return
-        from matplotlib.pyplot import plot, semilogy, hold, text, grid, axis, title
+        from matplotlib.pyplot import plot, semilogy, text, grid, axis, title
         dat = self  # for convenience and historical reasons
         # modify fake last entry in x for line extension-annotation
         if dat.x.shape[1] < 100:
@@ -1098,7 +1107,7 @@ class CMADataLogger(BaseDataLogger):
                 dat.x[-1, 5 + idx] = np.linspace(np.min(dat.x[:, 5:]),
                             np.max(dat.x[:, 5:]), dat.x.shape[1] - 5)
             else: # y-axis is in log
-                xdat = np.abs(dat.x[:, 5:] - np.array(x_opt, copy=False))
+                xdat = np.abs(dat.x[:, 5:] - np.asarray(x_opt))
                 idx = np.argsort(xdat[-2, :])
                 idx2 = np.argsort(idx)
                 xdat[-1, idx] = np.logspace(np.log10(np.min(abs(xdat[xdat!=0]))),
@@ -1111,7 +1120,7 @@ class CMADataLogger(BaseDataLogger):
             semilogy(dat.x[:, iabscissa], abs(xdat), '-')
         else:
             plot(dat.x[:, iabscissa], dat.x[:, 5:], '-')
-        hold(True)
+        pass  # Matplotlib now retains existing artists by default
         grid(True)
         ax = array(axis())
         # ax[1] = max(minxend, ax[1])
@@ -1388,15 +1397,45 @@ def _fileToMatrix(file_name):
 
 # END cmaplt.py
 
-if __name__ == '__main__':
-    if len(sys.argv) > 1 and sys.argv[1] == 'weave':
-        print('weaving now')
+def main():
+    """Plot CMA-ES logs and keep the window open, or save a figure."""
+    import argparse
+    from pathlib import Path
+    parser = argparse.ArgumentParser(description="Plot outcmaes*.dat logs.")
+    parser.add_argument("prefix", nargs="?", default="outcmaes",
+                        help="file prefix, optionally including a directory")
+    parser.add_argument("--save", metavar="FILE", help="save a PNG, PDF, or SVG")
+    parser.add_argument("--no-show", action="store_true", help="save without a GUI")
+    parser.add_argument("--backend", help="Matplotlib backend, e.g. MacOSX or TkAgg")
+    args = parser.parse_args()
+    if args.prefix == "weave":
         _weave_in()
-        exit()
-    print('--- close window to resume ---')
-    if len(sys.argv) > 1:
-        plot(sys.argv[1])
-    else:
-        plot()
+        return
+    if args.no_show and not args.save:
+        parser.error("--no-show requires --save FILE")
+    if args.no_show:
+        pyplot.switch_backend("Agg")
+    elif args.backend:
+        pyplot.switch_backend(args.backend)
+    for suffix in ("fit", "axlen", "stddev", "xmean", "xrecentbest"):
+        path = Path(args.prefix + suffix + ".dat")
+        if not path.is_file():
+            parser.error("missing data file: " + str(path))
     pyplot.ioff()
-    pyplot.show()
+    plot(args.prefix)
+    if not pyplot.get_fignums():
+        parser.error("no figure produced; logs need at least two fitness rows")
+    if args.save:
+        pyplot.savefig(args.save, dpi=160, bbox_inches="tight")
+        print("Saved " + args.save)
+    if not args.no_show:
+        from matplotlib import get_backend
+        if get_backend().lower() in ("agg", "pdf", "svg", "ps", "cairo", "template"):
+            parser.error("non-interactive backend " + get_backend() +
+                         "; use --save plot.png --no-show or --backend MacOSX on macOS")
+        print("Close the plot window to exit.")
+        pyplot.show(block=True)
+
+
+if __name__ == '__main__':
+    main()
