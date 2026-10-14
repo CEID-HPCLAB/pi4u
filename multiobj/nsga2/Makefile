@@ -1,9 +1,9 @@
-use_torc?=0
+use_torc?=1
 use_omp?=0
 
 # Makefile for compiling NSGA-II source code
-CC=gcc-16
-LD=gcc-16
+CC=gcc
+LD=gcc
 #CFLAGS=-Wall -ansi -pedantic -g
 
 CFLAGS = -g -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE

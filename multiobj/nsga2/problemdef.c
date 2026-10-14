@@ -7,7 +7,7 @@
 # include "global.h"
 # include "rand.h"
 
-void fitfun(double *x, int N, void *output, double *result, int ncon, double *constraints, int *winfo);
+void fitfun(double *x, int N, double *result, int ncon, double *constraints, int *winfo);
 
 void test_problem (double *xreal, double *xbin, int **gene, double *obj, double *constr)
 {
@@ -33,11 +33,11 @@ void test_problem_torc (double *x, int *pnx, double *obj, int *pno, double *cons
 	// constr[0] = obj[1] - 25;
 
 	// Option #1: fitfun code moved to fitfun.c and constraints stay here
-	// fitfun(x, nx, info, obj, ncon, constr, NULL);
+	// fitfun(x, nx, obj, ncon, constr, info);
 	//constr[0] = obj[1] - 25;
 
 	// Option #2: fitfun also handles the constraints
-	//fitfun(x, nx, info, obj, ncon, constr, NULL);
+	//fitfun(x, nx, obj, ncon, constr, info);
 
 	// the following stays as it was
 	if (ncon==0)

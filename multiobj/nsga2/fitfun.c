@@ -1,7 +1,7 @@
 #include <math.h>
 #include <unistd.h>
 
-void fitfun(double *x, int nx, void *output, double *result, int ncon, double *constraints, int *winfo) // ny must be also available
+void fitfun(double *x, int nx, double *result, int ncon, double *constraints, int *winfo) // ny must be also available
 {
 	usleep(10*1000);
 
