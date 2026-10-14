@@ -43,7 +43,7 @@ The eight task arguments are:
 | `constr_violation` | Aggregate violation | `CALL_BY_RES` |
 | `info` | Four metadata integers | `CALL_BY_COP` |
 
-The metadata is `[0, 0, generation, individual_index]`; generations start at 1 and individual indices at 0. `CALL_BY_VAL` is used for array input in this legacy TORC API; it does not change the evaluation function into a C scalar-by-value interface.
+The metadata is `[0, 0, generation, individual_index]`; generations start at 1 and individual indices at 0. `CALL_BY_VAL` is used for the array input `x` because the data is used as input only and no private copy is required because a dedicate memory buffer is used for each evaluation point.  
 
 The initial population and each offspring population are evaluated as synchronous batches. Selection, crossover, mutation, nondominated sorting, crowding-distance calculations, and result writing remain in the driver. Increasing the MPI process count does not create independent evolutionary populations or islands.
 
@@ -96,7 +96,7 @@ make use_torc=1
 
 The TORC setting selects `mpicc` for compiling and linking, defines `_USE_TORC_`, and obtains flags from `torc_cflags` and `torc_libs`.
 
-The Makefile defaults to `gcc-16` for serial and OpenMP builds. Override both compiler and linker if that command is unavailable:
+The Makefile defaults to `gcc` for serial and OpenMP builds. Override both compiler and linker if that command is unavailable:
 
 ```bash
 # Serial
@@ -115,8 +115,8 @@ Always clean when changing execution mode: Make does not track flag changes in e
 The executable reads a configuration filename as its first argument:
 
 ```bash
-TORC_WORKERS=4 mpirun -np 1 ./nsga2r config.in
-TORC_WORKERS=2 mpirun -np 4 ./nsga2r config.in
+TORC_WORKERS=4 mpirun -np 1 ./nsga2r test.in
+TORC_WORKERS=2 mpirun -np 4 ./nsga2r test.in
 ```
 
 `TORC_WORKERS` controls local workers per MPI process. Allocate CPUs accordingly, including allowance for runtime communication and any threads used inside the objective. Keep enough candidates in each evaluation batch to occupy the workers.
@@ -124,8 +124,8 @@ TORC_WORKERS=2 mpirun -np 4 ./nsga2r config.in
 For the serial or OpenMP executable:
 
 ```bash
-./nsga2r config.in
-OMP_NUM_THREADS=4 ./nsga2r config.in
+./nsga2r test.in
+OMP_NUM_THREADS=4 ./nsga2r test.in
 ```
 
 Use this complete, GUI-free configuration for the current objective:
@@ -207,19 +207,19 @@ The unused `test_problem()` retains the original interface, but changing it alon
 The separate objective helper has the following interface:
 
 ```c
-void fitfun(double *x, int nx, void *output, double *result,
+void fitfun(double *x, int nx, double *result,
             int ncon, double *constraints, int *winfo);
 ```
 
 Replace the active objective assignments with:
 
 ```c
-fitfun(x, nx, NULL, obj, ncon, constr, info);
+fitfun(x, nx, obj, ncon, constr, info);
 ```
 
 Use `nobj=2` and `ncon=0` for that example. To generalize to arbitrary numbers of objectives, extend the helper interface to include `no` and update both declaration and definition. The wrapper already receives that count through `pno`.
 
-In the call above, `output` is unused and set to `NULL`, while `info` is passed as application metadata through `winfo`.
+In the call above, `info` is passed as application metadata through `winfo`.
 
 ## Output files
 
