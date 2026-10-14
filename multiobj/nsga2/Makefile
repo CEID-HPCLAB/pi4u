@@ -9,7 +9,7 @@ LD=gcc-16
 CFLAGS = -g -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CFLAGS += -Wall
 CFLAGS += -DIODUMP=1 -DBINARY=0 
-LDFLAGS += -pthread -lm
+LDFLAGS += -pthread
 
 ifeq ($(use_torc),1)
 CC = mpicc
@@ -22,6 +22,8 @@ ifeq ($(use_omp),1)
 CFLAGS += -D_USE_OPENMP_=1 -fopenmp
 LIBS += -fopenmp
 endif
+
+LIBS += -lm
 
 RM=rm -f
 

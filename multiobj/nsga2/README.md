@@ -49,7 +49,7 @@ The initial population and each offspring population are evaluated as synchronou
 
 Objective data required by workers must be available on every process executing tasks. The task receives the dimensions explicitly, so custom evaluation code should use those arguments instead of assuming optimizer globals are initialized on remote workers. Keep evaluations thread-safe, and use unique files or directories for external simulations.
 
-Use a current TORC_LITE version with zero-length argument support: the task passes a zero-length constraint array when `ncon=0`.
+Please not that TORC_LITE supports zero-length arguments: the task passes a zero-length constraint array when `ncon=0`.
 
 ## Requirements and TORC installation
 
