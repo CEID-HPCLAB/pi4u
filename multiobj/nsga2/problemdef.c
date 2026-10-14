@@ -7,7 +7,7 @@
 # include "global.h"
 # include "rand.h"
 
-void fitfun(double *x, int N, void *output, int *winfo, double *result, int ncon, double *constraints);
+void fitfun(double *x, int N, void *output, double *result, int ncon, double *constraints, int *winfo);
 
 void test_problem (double *xreal, double *xbin, int **gene, double *obj, double *constr)
 {
