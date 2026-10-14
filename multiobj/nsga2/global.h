@@ -112,8 +112,7 @@ void bin_mutate_ind (individual *ind);
 void real_mutate_ind (individual *ind);
 
 void test_problem (double *xreal, double *xbin, int **gene, double *obj, double *constr);
-//void test_problem_v2 (double *x, int *pnx, double *obj, int *pno, int info[4]);
-void test_problem_v2 (double *x, int *pnx, double *obj, int *pno, double *constr, int *pncon, double *constr_violation, int info[4]);
+void test_problem_torc (double *x, int *pnx, double *obj, int *pno, double *constr, int *pncon, double *constr_violation, int info[4]);
 
 
 void assign_rank_and_crowding_distance (population *new_pop);

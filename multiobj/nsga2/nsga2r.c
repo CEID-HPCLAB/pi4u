@@ -73,7 +73,7 @@ int main (int argc, char **argv)
     population *mixed_pop;
 
 #if defined(_USE_TORC_)
-	torc_register_task(test_problem_v2);
+	torc_register_task(test_problem_torc);
 	torc_init(argc, argv, MODE_MW);
 #endif
 

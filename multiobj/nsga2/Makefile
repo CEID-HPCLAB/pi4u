@@ -2,8 +2,8 @@ use_torc?=0
 use_omp?=0
 
 # Makefile for compiling NSGA-II source code
-CC=gcc
-LD=gcc
+CC=gcc-16
+LD=gcc-16
 #CFLAGS=-Wall -ansi -pedantic -g
 
 CFLAGS = -g -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
@@ -25,25 +25,19 @@ endif
 
 RM=rm -f
 
-OBJS1:=allocate.o auxiliary.o crossover.o crowddist.o decode.o display.o dominance.o eval.o fillnds.o fitfun_inline.o initialize.o list.o merge.o mutation.o nsga2r.o problemdef.o rand.o rank.o report.o sort.o tourselect.o
+OBJS1:=allocate.o auxiliary.o crossover.o crowddist.o decode.o display.o dominance.o eval.o fillnds.o fitfun.o initialize.o list.o merge.o mutation.o nsga2r.o problemdef.o rand.o rank.o report.o sort.o tourselect.o
 MAIN1=nsga2r
 
-OBJS2:=allocate.o auxiliary.o crossover.o crowddist.o decode.o display.o dominance.o eval.o fillnds.o fitfun_external.o initialize.o list.o merge.o mutation.o nsga2r.o problemdef.o rand.o rank.o report.o sort.o tourselect.o
-MAIN2=nsga2r_ext
-
-all:$(MAIN1) $(MAIN2)
+all:$(MAIN1)
 
 $(MAIN1):$(OBJS1)
 	$(LD) $(LDFLAGS) $(OBJS1) -o $(MAIN1) $(LIBS)
-
-$(MAIN2):$(OBJS2)
-	$(LD) $(LDFLAGS) $(OBJS2) -o $(MAIN2) $(LIBS)
 
 %.o: %.c global.h rand.h
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	$(RM) $(OBJS1) $(MAIN1) $(OBJS2) $(MAIN2)
+	$(RM) $(OBJS1) $(MAIN1)
 
 clear:
 	$(RM) eval_db_*.txt curgen_db_*.txt *.out
