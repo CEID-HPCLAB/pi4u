@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 	int  niche   = moead_params.Niche;	// 20	//neighborhood size
 
 	numVariables  = moead_params.Nth;	// number of variables  (global variable)
-	numObjectives = moead_params.Nobj;	// number of objectives (global variable) 
+	numObjectives = moead_params.Nobj;	// number of objectives (global variable)
 
 	id_cx = moead_params.id_cx;	//20;		// crossover (global variable)
 	id_mu = moead_params.id_mu;	//20;		// for mutation (global variable)
@@ -194,17 +194,17 @@ int main(int argc, char *argv[])
 		uppBound[i] = moead_params.upperbound[i];	//+10;
 	}
 
-//	seed = (seed + 111)%1235;	
+//	seed = (seed + 111)%1235;
 	seed = moead_params.seed;
 
-	rnd_uni_init = -(long)seed;	
+	rnd_uni_init = -(long)seed;
 
 	int popsize = moead_params.PopSize;	//32;
 
 	torc_register_task((void *)obj_eval_raw);
 	torc_init(argc, argv, MODE_MW);
 
-	TMOEAD  MOEAD;      
+	TMOEAD MOEAD;
 	int run = 1;
 
 	int param;
@@ -218,7 +218,8 @@ int main(int argc, char *argv[])
 	if(numObjectives==3)
 	{
 		//(n+1)(n+2)/2=x -> n = 0.5*(sqrt(8x+1)-3)
-		param = (int) (0.5*sqrt(8*popsize+1)-3);
+		//param = (int) (0.5*sqrt(8*popsize+1)-3);
+		param = (int)floor((sqrt(8.0 * popsize + 1.0) - 3.0) / 2.0);
 
 		MOEAD.run(param, niche, max_gen, run);  //23 -3  popsize 300 // (23+1)(24+1)/2=300
 	}
