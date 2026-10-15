@@ -1,0 +1,12 @@
+Nth				1
+Nobj			2
+Niche			20
+MaxStages	16
+PopSize		128
+id_cx			20
+id_mu			20
+Bdef			-10     10
+#B0				-6      6
+#B1				-6      6
+seed			1
+
