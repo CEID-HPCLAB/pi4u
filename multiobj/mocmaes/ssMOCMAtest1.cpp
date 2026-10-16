@@ -29,7 +29,8 @@
 // Implementation of the MO-CMA-ES
 //#include <shark/Algorithms/DirectSearch/MOCMA.h>
 
-//#include <omp.h>
+#include <iostream>
+#include <cstdio>
 #include <torc.h>
 
 int checkpoint_restart = 0;
@@ -70,8 +71,8 @@ void params_init()
 	mocma_params.lb = -10;   /* Default LB, same for all */
 	mocma_params.ub = +10;   /* Default UB, same for all */
 
-	mocma_params.lowerbound = (double *)malloc(mocma_params.Nth*sizeof(double));
-	mocma_params.upperbound = (double *)malloc(mocma_params.Nth*sizeof(double));
+	mocma_params.lowerbound = reinterpret_cast<double *>(malloc(mocma_params.Nth*sizeof(double)));
+	mocma_params.upperbound = reinterpret_cast<double *>(malloc(mocma_params.Nth*sizeof(double)));
 	for (int i = 0; i < mocma_params.Nth; i++) {
 		mocma_params.lowerbound[i] = mocma_params.lb;
 		mocma_params.upperbound[i] = mocma_params.ub;
@@ -106,22 +107,28 @@ void params_init()
 			continue;
 		}
 
-		if (strstr(line, "Nth")) {
+		if (strstr(line, "Nth"))
+		{
 			sscanf(line, "%*s %d", &mocma_params.Nth);
 		}
-		else if (strstr(line, "MaxStages")) {
+		else if (strstr(line, "MaxStages"))
+		{
 			sscanf(line, "%*s %d", &mocma_params.MaxStages);
 		}
-		else if (strstr(line, "PopSize")) {
+		else if (strstr(line, "PopSize"))
+		{
 			sscanf(line, "%*s %d", &mocma_params.PopSize);
 		}
-		else if (strstr(line, "Bdef")) {
+		else if (strstr(line, "Bdef"))
+		{
 			sscanf(line, "%*s %lf %lf", &mocma_params.lb, &mocma_params.ub);
 		}
-		else if (strstr(line, "seed")) {
+		else if (strstr(line, "seed"))
+		{
 			sscanf(line, "%*s %ld", &mocma_params.seed);
 		}
-		else if (strstr(line, "initialSigma")) {
+		else if (strstr(line, "initialSigma"))
+		{
 			sscanf(line, "%*s %lf", &mocma_params.initialSigma);
 		}
 	}
@@ -133,8 +140,8 @@ void params_init()
 
 	free(mocma_params.lowerbound);
 	free(mocma_params.upperbound);
-	mocma_params.lowerbound = (double *)malloc(mocma_params.Nth*sizeof(double));
-	mocma_params.upperbound = (double *)malloc(mocma_params.Nth*sizeof(double));
+	mocma_params.lowerbound = reinterpret_cast<double *>(malloc(mocma_params.Nth*sizeof(double)));
+	mocma_params.upperbound = reinterpret_cast<double *>(malloc(mocma_params.Nth*sizeof(double)));
 
 	int found;
 	for (int i = 0; i < mocma_params.Nth; i++) {
