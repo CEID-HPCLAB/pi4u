@@ -1,5 +1,5 @@
 #CCPLUS=CC -std=c++11
-MPI_CXX=g++-16
+# MPI_CXX=g++-16
 CCPLUS=mpic++ -std=c++14
 CC=gcc
 # SHARK_DIR=./Shark-3.1.0/include
@@ -8,17 +8,21 @@ SHARK_DIR=./Shark
 #SHARK_DIR=/Users/phadjido/pi4u/multiobj/mocmaes_torc/Shark
 # SHARK_DIR=/home/phadjido/pi4u/multiobj/mocmaes_torc/Shark/build/include
 
-CFLAGS=-g # -fopenmp
+CFLAGS=-g
 CFLAGS+=-I$(SHARK_DIR)/include -I$(SHARK_DIR)/build/include
+CFLAGS+=-I/opt/homebrew/include
 CFLAGS+=`torc_cflags`
+
+CFLAGS+=-Wno-deprecated-declarations
+
 LIBS=-L$(SHARK_DIR)/build/lib -lshark
-LIBS+=-lopenblas  -lboost_thread -lboost_serialization `torc_libs`
+LIBS+=-L/opt/homebrew/opt/openblas/lib
+LIBS+=-lopenblas 
+LIBS+=-L/opt/homebrew/lib
+LIBS+= -lboost_thread -lboost_serialization `torc_libs`
 
 
-#BOOST_PREFIX := $(shell brew --prefix boost)
-#CFLAGS += -I$(BOOST_PREFIX)/include
-
-all:  MOCMAtest1 ssMOCMAtest1 #MOCMAtest1
+all: MOCMAtest1 ssMOCMAtest1
 
 MOCMAtest1: MOCMAtest1.o fitfun.o
 	$(CCPLUS) $(CFLAGS) -o MOCMAtest1 MOCMAtest1.o fitfun.o $(LIBS)

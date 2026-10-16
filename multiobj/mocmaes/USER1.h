@@ -127,13 +127,13 @@ struct USER1  : public MultiObjectiveFunction
 	SearchPointType proposeStartingPoint() const {
 		int numVar = numberOfVariables();
 		RealVector x(numVar);
-		double lb[numVar], ub[numVar];
-		getBounds(lb, ub, numVar);
+		std::vector<double> lb(numVar), ub(numVar);
+		getBounds(lb.data(), ub.data(), numVar);
 
 #if 0	// TODO: shrink bounds for the initial samples
-		double shrink_factor = mocma_params.shrink_factor; 
+		double shrink_factor = mocma_params.shrink_factor;
 		double mean, width;
-		double s_lb[numVar], s_ub[numVar];
+		std::vector<double> s_lb(numVar), s_ub(numVar);
 
 		for (std::size_t i = 0; i < x.size(); i++) {
 			mean = 0.5*(ub[i]-lb[i]);
@@ -164,9 +164,9 @@ struct USER1  : public MultiObjectiveFunction
 			lower.resize(numberOfVariables);
 			upper.resize(numberOfVariables);
 
-			double l[numberOfVariables], u[numberOfVariables];
-			getBounds(l, u, numberOfVariables);
-			
+			std::vector<double> l(numberOfVariables), u(numberOfVariables);
+			getBounds(l.data(), u.data(), numberOfVariables);
+
 			for (int i = 0; i < numberOfVariables; i++)
 			{
 				lower(i) = l[i];
@@ -179,8 +179,8 @@ struct USER1  : public MultiObjectiveFunction
 	bool isFeasible( const SearchPointType & input) const {
 //		printf("calling isFeasible...\n");
 		size_t numVar = numberOfVariables();
-		double l[numVar], u[numVar];
-		getBounds(l, u, numVar);
+		std::vector<double> l(numVar), u(numVar);
+		getBounds(l.data(), u.data(), numVar);
 
 		SIZE_CHECK(input.size() == numberOfVariables());
 		for(std::size_t i = 0; i != numberOfVariables(); ++i){

@@ -29,7 +29,7 @@
 // Implementation of the MO-CMA-ES
 //#include <shark/Algorithms/DirectSearch/MOCMA.h>
 
-#include <omp.h>
+//#include <omp.h>
 #include <torc.h>
 
 int checkpoint_restart = 0;

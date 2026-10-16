@@ -263,7 +263,7 @@ int main( int argc, char ** argv ) {
 	{
 	char pareto_file[256];
 
-	sprintf(pareto_file, "pareto_mocma_%03ld.txt", i);
+	snprintf(pareto_file, 256, "pareto_mocma_%03ld.txt", i);
 	FILE *fp = fopen(pareto_file, "w");
 	for( std::size_t i = 0; i < mocma.solution().size(); i++ ) {
 		for( std::size_t j = 0; j < user1.numberOfVariables(); j++ ) {

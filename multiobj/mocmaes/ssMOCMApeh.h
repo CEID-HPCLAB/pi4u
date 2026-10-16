@@ -30,6 +30,12 @@
 #ifndef SHARK_ALGORITHMS_DIRECT_SEARCH_STEADYSTATEMOCMA
 #define SHARK_ALGORITHMS_DIRECT_SEARCH_STEADYSTATEMOCMA
 
+#include <string>
+#include <iostream>
+#include <vector>
+#include <cstdio>
+#include <utility>
+
 // MOO specific stuff
 #include <shark/Algorithms/DirectSearch/Operators/Indicators/HypervolumeIndicator.h>
 #include <shark/Algorithms/DirectSearch/Operators/Indicators/AdditiveEpsilonIndicator.h>
@@ -45,7 +51,7 @@ namespace shark {
  *
  * Please see the following papers for further reference:
  *	- Igel, Suttorp and Hansen. Steady-state Selection and Efficient Covariance Matrix Update in the Multi-Objective CMA-ES.
- *	- Voß, Hansen and Igel. Improved Step Size Adaptation for the MO-CMA-ES.
+ *	- Voï¿½, Hansen and Igel. Improved Step Size Adaptation for the MO-CMA-ES.
  */
 template<typename Indicator=HypervolumeIndicator>
 class IndicatorBasedSteadyStateMOCMA : public AbstractMultiObjectiveOptimizer<RealVector >{
@@ -148,14 +154,20 @@ public:
 		int ny = function.numberOfObjectives();
 		int np = initialSearchPoints.size();
 
-		double input[np][nx];   // peh: explicit memory allocation for safety
-		double output[np][ny];
+		//double input[np][nx];   // peh: explicit memory allocation for safety
+		//double output[np][ny];
+		std::vector<double> input_storage(np * nx);
+		std::vector<double*> input(np);
+		for (int i = 0; i < np; ++i)
+			input[i] = input_storage.data() + i * nx;
 
-//#pragma omp parallel for
+		std::vector<double> output_storage(np * ny);
+		std::vector<double*> output(np);
+		for (int i = 0; i < np; ++i)
+			output[i] = output_storage.data() + i * ny;
+
 		int info[4];
-		for(std::size_t i = 0; i < np; ++i){
-//		for(std::size_t i = 0; i != initialSearchPoints.size(); ++i){
-			//values[i] = function.eval(initialSearchPoints[i]);
+		for(std::size_t i = 0; i < np; ++i) {
 			info[0] = 0; info[1] = 0; info[2] = 0; info[3] = i;
 
 			for (int j=0; j<nx; j++) {
@@ -196,75 +208,72 @@ public:
 #if 0
 		penalizingEvaluator( function, offspring.begin(), offspring.end() );
 #else
-                int nx = function.numberOfVariables();
-                int ny = function.numberOfObjectives();
-                int np = offspring.size();
+		int nx = function.numberOfVariables();
+		int ny = function.numberOfObjectives();
+		int np = offspring.size();
 
 		printf("XXX: offsping.size() = %d\n", np);
 
-                double input[np][nx];
-                double output[np][ny];
+		//double input[np][nx];
+		//double output[np][ny];
+		std::vector<double> input_storage(np * nx);
+		std::vector<double*> input(np);
+		for (int i = 0; i < np; ++i)
+			input[i] = input_storage.data() + i * nx;
 
-                std::vector<RealVector> values(offspring.size());
+		std::vector<double> output_storage(np * ny);
+		std::vector<double*> output(np);
+		for (int i = 0; i < np; ++i)
+			output[i] = output_storage.data() + i * ny;
 
-                int info[4];
+		std::vector<RealVector> values(offspring.size());
+
+		int info[4];
 		cmastep++;
-
-//#pragma omp parallel for
-                for(std::size_t i = 0; i < np; ++i){
-//              for(std::size_t i = 0; i != offspring.size(); ++i){
-                        //if(!function.isFeasible(offspring[i].searchPoint() ))
-                        //{
-                        //      std::cout << offspring[i].searchPoint() << std::endl;
-                        //	throw SHARKEXCEPTION("[MOCMA::xxxx] offspring point(s) not feasible");
-                        //}
+		for (std::size_t i = 0; i < np; ++i) {
 #if 0
-                        values[i] = function.eval(offspring[i].searchPoint() );
+			values[i] = function.eval(offspring[i].searchPoint() );
 #else
-                        info[0] = 0; info[1] = 0; info[2] = cmastep; info[3] = i;
-
-                        for (int j=0; j<nx; j++) {
-                                input[i][j]=offspring[i].searchPoint()[j];
-                        }
-                        torc_create(-1, (void (*)())geval, 5,
-                                nx, MPI_DOUBLE, CALL_BY_VAL,
-                                1, MPI_INT, CALL_BY_COP,
-                                ny, MPI_DOUBLE, CALL_BY_RES,
-                                1, MPI_INT, CALL_BY_COP,
-                                4, MPI_INT, CALL_BY_COP,
-                                input[i], &nx, output[i], &ny, info);
+			info[0] = 0; info[1] = 0; info[2] = cmastep; info[3] = i;
+			for (int j=0; j<nx; j++) {
+				input[i][j]=offspring[i].searchPoint()[j];
+			}
+			torc_create(-1, (void (*)())geval, 5,
+				nx, MPI_DOUBLE, CALL_BY_VAL,
+				1, MPI_INT, CALL_BY_COP,
+				ny, MPI_DOUBLE, CALL_BY_RES,
+				1, MPI_INT, CALL_BY_COP,
+				4, MPI_INT, CALL_BY_COP,
+				input[i], &nx, output[i], &ny, info);
 
 #endif
-                }
-                torc_waitall();
-
-                {
-                char filename[256];
-                FILE *fp;
-
-                sprintf(filename, "ss_curgen_db_%03d.txt", cmastep);
-                fp = fopen(filename, "w");
-                for(std::size_t i = 0; i < np; ++i){
-                        for (int j = 0; j < nx; j++)
-                                fprintf(fp, "%f ", input[i][j]);
-                        for (int j = 0; j < ny; j++)
-                                fprintf(fp, "%f ", output[i][j]);
-                        fprintf(fp, "\n");
-                }
-                fclose(fp);
-
-                }
-
-               for(std::size_t i = 0; i != offspring.size(); ++i){
-                        ResultType v(ny);
-                        for (int j = 0; j < ny; j++) v(j) = output[i][j];
-                        values[i] = v;
-                        //xxx
-
-                        offspring[i].penalizedFitness() = values[i];
-                        offspring[i].unpenalizedFitness() = values[i];
-                }
-
+        }
+		torc_waitall();
+		
+		{
+			char filename[256];
+			FILE *fp;
+			
+			sprintf(filename, "ss_curgen_db_%03d.txt", cmastep);
+			fp = fopen(filename, "w");
+			for (std::size_t i = 0; i < np; ++i) {
+				for (int j = 0; j < nx; j++)
+					fprintf(fp, "%f ", input[i][j]);
+				for (int j = 0; j < ny; j++)
+					fprintf(fp, "%f ", output[i][j]);
+                fprintf(fp, "\n");
+            }
+            fclose(fp);
+		}
+		
+		for(std::size_t i = 0; i != offspring.size(); ++i){
+			ResultType v(ny);
+			for (int j = 0; j < ny; j++) v(j) = output[i][j];
+			values[i] = v;
+            //xxx
+			offspring[i].penalizedFitness() = values[i];
+			offspring[i].unpenalizedFitness() = values[i];
+		}
 #endif
 		updatePopulation(offspring);
 	}
@@ -343,7 +352,8 @@ protected:
 			offspring.updateAsOffspring();
 			parent.updateAsParent(CMAChromosome::Successful);
 		}
-		else if (m_notionOfSuccess == PopulationBased && offspring.selected() && offspring.rank() <= parent.rank() ) {
+		else if (m_notionOfSuccess == PopulationBased && offspring.selected() && offspring.rank() <= parent.rank() )
+		{
 			offspring.updateAsOffspring();
 			parent.updateAsParent(CMAChromosome::Successful);
 		}else{
@@ -397,6 +407,6 @@ private:
 typedef IndicatorBasedSteadyStateMOCMA< HypervolumeIndicator > SteadyStateMOCMA;
 typedef IndicatorBasedSteadyStateMOCMA< AdditiveEpsilonIndicator > EpsilonSteadyStateMOCMA;
 
-}
+} // namespace shark
 
 #endif
