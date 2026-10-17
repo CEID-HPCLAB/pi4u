@@ -1,7 +1,9 @@
 CC=gcc
 CFLAGS=-O3 -Wall -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+CFLAGS+=-I/opt/homebrew/include
 #CFLAGS+= -DDEBUG=1
 LDFLAGS=-lgsl -lgslcblas -lm
+LDFLAGS+= -L/opt/homebrew/lib
 
 all: normaltest bananatest generaltest
 
