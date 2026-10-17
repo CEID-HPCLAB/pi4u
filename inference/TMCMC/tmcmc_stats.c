@@ -657,8 +657,13 @@ double logpriorpdf(double *theta, int n)
 				/* normal */
 				else if(data.compositeprior_distr[i] == 1)
 				{
-					res += -0.5*( log( 2.0*M_PI*pow(data.prior_sigma[i],2) ) +
-								pow( theta[i]-data.prior_mu[i]/data.prior_sigma[i], 2 ) );
+					// XXX: check this fix (and the added parenthenis for (theta[i]-data.prior_mu[i])
+					//res += -0.5*( log( 2.0*M_PI*pow(data.prior_sigma[i],2) ) +
+					//			pow( (theta[i]-data.prior_mu[i])/data.prior_sigma[i], 2 ) );
+
+					double z = (theta[i] - data.prior_mu[i]) / data.prior_sigma[i];
+					res += -0.5 * log(2.0 * M_PI) - log(data.prior_sigma[i]) - 0.5 * z * z;
+
 				}
 				/* truncated normal */
 				else if(data.compositeprior_distr[i] == 2)

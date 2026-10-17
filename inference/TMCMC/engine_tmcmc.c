@@ -1434,7 +1434,9 @@ int main(int argc, char *argv[])
                         in_tparam[d] += data.lowerbound[d];
                     }
                     else if (data.compositeprior_distr[d] == 1) {
-                        mvnrnd(&data.prior_mu[d], &data.prior_sigma[d], &in_tparam[d], 1);
+                        // mvnrnd(&data.prior_mu[d], &data.prior_sigma[d], &in_tparam[d], 1); // XXX: check this fix
+                        double variance = data.prior_sigma[d] * data.prior_sigma[d];
+                        mvnrnd(&data.prior_mu[d], &variance, &in_tparam[d], 1);
                     }
                     else if (data.compositeprior_distr[d] == 2) {
                       	in_tparam[d] = truncated_normal_rand (data.prior_mu[d], data.prior_sigma[d], data.lowerbound[d], data.upperbound[d]);
