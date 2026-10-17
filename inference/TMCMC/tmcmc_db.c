@@ -62,7 +62,7 @@ void init_curgen_db()
 }
 
 
-void update_curres_db(double point[EXPERIMENTAL_RESULTS], double F)
+void update_curres_db(double point[/*EXPERIMENTAL_RESULTS*/], double F)
 {
 	int i, pos;
 	

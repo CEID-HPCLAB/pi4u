@@ -4,6 +4,8 @@ use_omp?=0
 CC = gcc
 CFLAGS = -g -ggdb -O3 -std=c99 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 CFLAGS += -Wall 
+CFLAGS += -I/opt/homebrew/include
+LDFLAGS += -L/opt/homebrew/lib
 LDFLAGS += -lgsl -lgslcblas -lm
 
 ifeq ($(use_torc),1)
@@ -27,6 +29,7 @@ engine_tmcmc: engine_tmcmc.c engine_tmcmc.h tmcmc_stats.c tmcmc_db.c auxil.c fit
 
 clean:
 	rm -f engine_tmcmc  *.o
+	rm -rf *.dSYM
 
 clear:
 	rm -rf curgen_db*.txt curres_db*.txt runinfo.txt full_db*.txt fitness.txt final.txt fzero*.txt

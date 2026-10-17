@@ -7,7 +7,7 @@
 Nth		2
 
 # Max number of generations
-MaxStages	1
+MaxStages	10
 
 # Population size
 PopSize		10000
