@@ -25,3 +25,4 @@ sensitivity_tool: sensitivity_tool.c fitfun.c
 
 clean:
 	rm -f propagation_tool sensitivity_tool *.o
+	rm -rf *.dSYM

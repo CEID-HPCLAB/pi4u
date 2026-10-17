@@ -23,7 +23,7 @@ void taskfun(double *x, int *pn, double *res, int *info)
 	printf("executing task (%d,%d,%d,%d,*)\n", gen, chain, step, task);
 
 #if 1
-	*res = fitfun(x, n, (void *)NULL, info);
+	*res = -fitfun(x, n, (void *)NULL, info);
 
 #else
 	/* this is a very simple example */
@@ -81,11 +81,11 @@ int main(int argc, char *argv[])
 	}
 */
 
-	#define MAXPOINTS 64
+	#define MAXPOINTS 4096
 	char line[2048];
 	double TP[MAXPOINTS][PROBDIM], ref[MAXPOINTS], res[MAXPOINTS];
 	int t = 0;
-	while (fgets(line, 2048, fp)!= NULL)
+	while (fgets(line, sizeof(line), fp)!= NULL)
 	{
 		printf("line %d: %s", t, line);
 		char *p;
@@ -95,7 +95,13 @@ int main(int argc, char *argv[])
 			TP[t][i] = atof(p);
 			p = strtok(NULL, " \t\n");
 		}
-		if (p) p = strtok(NULL, " \t\n");
+
+		if (i != PROBDIM || !p) {
+				fprintf(stderr, "Invalid or incomplete input row\n");
+				continue;
+		}
+
+		//if (p) p = strtok(NULL, " \t\n");
 		if (p) ref[t] = atof(p);
 
 		t++;
