@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include "gnuplot_i.h"
 
-int display = 1;
+int display = 0;
 
 gnuplot_ctrl * g = NULL;
 

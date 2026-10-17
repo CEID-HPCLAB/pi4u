@@ -2,9 +2,12 @@ use_torc?=0
 
 CPP=g++
 CPPFLAGS=-std=c++11 -O2 -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+CPPFLAGS+=-I/opt/homebrew/include
+
 CC=gcc
 CFLAGS=-O2
 LDFLAGS=-lgsl -lgslcblas
+LDFLAGS+=-L/opt/homebrew/lib
 
 # uncomment to enable parallel execution
 ifeq ($(use_torc),1)
@@ -25,6 +28,7 @@ display_gen.exe: display_gen.c gnuplot_i.c
 
 clean:
 	rm -f *.exe
+	rm -rf *.dSYM
 
 clear:
 	rm -f curgen_db*.txt

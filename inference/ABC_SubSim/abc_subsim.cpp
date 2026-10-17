@@ -298,7 +298,7 @@ void abc_subsim::run()
 	gsl_vector * acc_rate_array = gsl_vector_alloc(pivot);
 	gsl_vector * mean = gsl_vector_alloc(PROBDIM);
 
-	size_t perm[population_size]; // maybe use gsl_permutation ?
+	std::vector<size_t> perm(population_size); // maybe use gsl_permutation ?
 
 	double qoi_prev;
 
@@ -330,7 +330,7 @@ void abc_subsim::run()
 	for(level=1; level<max_level; ++level)
 	{
 		// get achieved tolerance level
-		gsl_sort_index(perm, db.discrepancy_array->data, db.discrepancy_array->stride, db.discrepancy_array->size);
+		gsl_sort_index(perm.data(), db.discrepancy_array->data, db.discrepancy_array->stride, db.discrepancy_array->size);
 		double tolerance_curr = 0.5*(gsl_vector_get(db.discrepancy_array,perm[pivot]) + gsl_vector_get(db.discrepancy_array,perm[pivot+1]));
 
 		// store previous values
@@ -361,7 +361,7 @@ void abc_subsim::run()
 //		tune_covariance(sample_array_prev, discrepancy_array_prev, tolerance_curr, db.sample_array,
 //				db.discrepancy_array, acc_rate_array, covariance, perm, level);
 		tune_covariance_in_parallel(sample_array_prev, discrepancy_array_prev, tolerance_curr, db.sample_array,
-				db.discrepancy_array, perm, level);
+				db.discrepancy_array, perm.data(), level);
 #endif
 
 		std::cout << "proposal covariance:\n"; gsl_matrix_fprintf_as_matrix(stdout, covariance, "%le");
@@ -374,7 +374,7 @@ void abc_subsim::run()
 #endif
 
 		// run MH
-		run_mh_in_parallel(chain_length, perm, sample_array_prev, discrepancy_array_prev, tolerance_curr, acc_rate_array, level);
+		run_mh_in_parallel(chain_length, perm.data(), sample_array_prev, discrepancy_array_prev, tolerance_curr, acc_rate_array, level);
 
 		double mean_acc_rate = gsl_stats_mean(acc_rate_array->data, acc_rate_array->stride, acc_rate_array->size);
 		std::cout << "mean acc_rate: " << mean_acc_rate << std::endl;
@@ -708,7 +708,14 @@ void abc_subsim::tune_covariance_in_parallel(
 
 	gsl_vector * acc_rate_array = gsl_vector_alloc(attempts);
 
-	double acc_rate_mat[attempts][npoints][ntries];
+	//double acc_rate_mat[attempts][npoints][ntries];
+	std::vector<std::vector<std::vector<double>>> acc_rate_mat(
+		attempts,
+		std::vector<std::vector<double>>(
+			npoints,
+			std::vector<double>(ntries, 0.0)
+		)
+	);
 
 	chain_length_test = 1;
 
