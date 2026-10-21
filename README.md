@@ -28,6 +28,8 @@ The current source tree includes the following components. Parallel execution op
 | Single-objective optimization | CMA-ES, including an experimental asynchronous engine | [`singleopt/cmaes`](singleopt/cmaes/) |
 | Single-objective optimization | AMaLGaM | [`singleopt/AMaLGaM`](singleopt/AMaLGaM/) |
 | Multiobjective optimization | NSGA-II | [`multiobj/nsga2`](multiobj/nsga2/) |
+| Multiobjective optimization | MOEAD | [`multiobj/nsga2`](multiobj/moead/) |
+| Multiobjective optimization | MOCMAES | [`multiobj/nsga2`](multiobj/mocmaes/) |
 | Rare-event estimation | Subset simulation with predefined or adaptive levels | [`rare/subset`](rare/subset/) |
 | Numerical differentiation | Parallel numerical differentiation library (PNDL), gradient and Hessian tools | [`derivatives`](derivatives/) |
 | Hierarchical inference | Hierarchical Bayesian modeling code and examples | [`hierarchical`](hierarchical/) |
