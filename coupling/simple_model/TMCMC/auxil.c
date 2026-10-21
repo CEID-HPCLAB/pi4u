@@ -10,7 +10,36 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
+
+#if defined(_USE_TORC_)
+#include <mpi.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 #include <torc.h>
+
+#ifdef __cplusplus
+}
+#endif
+
+#else
+
+#include <pthread.h>
+static int torc_node_id() { return 0; }
+static int torc_num_nodes() { return 1; }
+
+#if defined(_USE_OPENMP_)
+#include <omp.h>
+static int torc_i_worker_id() { return omp_get_thread_num(); }
+static int torc_i_num_workers() { return omp_get_max_threads(); }
+#else
+static int torc_i_worker_id() { return 0; }
+static int torc_i_num_workers() { return 1; }
+#endif
+
+#endif
 
 #include "gsl_headers.h"
 
@@ -37,12 +66,16 @@ void reset_nfc_task()
 
 void reset_nfc()
 {
+#if defined(_USE_TORC_)
     int i;
 
     for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, (void *)reset_nfc_task, 0);
+        torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())reset_nfc_task, 0);
     }
     torc_waitall();
+#else
+    reset_nfc_task();
+#endif
 }
 
 void get_nfc_task(int *x)
@@ -55,11 +88,15 @@ int get_nfc()
     int i;
     int c[1024]; /* MAX_NODES*/
 
+#if defined(_USE_TORC_)
     for (i = 0; i < torc_num_nodes(); i++) {
-        torc_create_ex(i*torc_i_num_workers(), 1, (void *)get_nfc_task, 1,
+        torc_create_ex(i*torc_i_num_workers(), 1, (void (*)())get_nfc_task, 1,
                 1, MPI_INT, CALL_BY_RES, &c[i]);
     }
     torc_waitall();
+#else
+    get_nfc_task(&c[0]);
+#endif
 
     unsigned int s = 0;
     printf("get_nfc:");
@@ -218,6 +255,7 @@ double compute_std(double *v, int n, double mean)
 /**********************************************/
 const gsl_rng_type *T;
 gsl_rng **r;
+int *local_seed;
 
 void gsl_rand_init(int seed)
 {
@@ -225,16 +263,23 @@ void gsl_rand_init(int seed)
     gsl_rng_env_setup();
 
     T = gsl_rng_default;
-    r = malloc(local_workers*sizeof(gsl_rng *));
+    r = (gsl_rng **)malloc(local_workers*sizeof(gsl_rng *));
     for (i = 0; i < local_workers; i++) {
         r[i] = gsl_rng_alloc (T);
     }
+
+    if (seed == 0) seed = time(0);
 
     for (i = 0; i < local_workers; i++) {
 #if VERBOSE
         printf("node %d: initializing rng %d with seed %d\n", torc_node_id(), i, seed+i+local_workers*torc_node_id());
 #endif
         gsl_rng_set(r[i], seed+i+local_workers*torc_node_id());
+    }
+
+    local_seed = (int *)malloc(local_workers*sizeof(int));
+    for (i = 0; i < local_workers; i++) {
+        local_seed[i] = seed+i+local_workers*torc_node_id();
     }
 }
 
@@ -432,8 +477,10 @@ int mvnrnd(double *mean, double *sigma, double *out, int N)
 #if 1
 void aux_init()
 {
-    torc_register_task(reset_nfc_task);
-    torc_register_task(get_nfc_task);
+#if defined(_USE_TORC_)
+    torc_register_task((void *)reset_nfc_task);
+    torc_register_task((void *)get_nfc_task);
+#endif
 }
 #endif
 
@@ -533,3 +580,37 @@ double logmvnpdf(int n, double *xv, double *mv, double *vm)
     double result = gsl_dmvnorm(n, xv, mv, vm, 1);
     return result;
 }
+
+
+#include "thirdparty/truncated_normal.c"
+
+/******************************************************************************/
+double truncated_normal_pdf (double x, double mu, double sigma, double a, double b)
+{
+    double pdf;
+
+    pdf = truncated_normal_ab_pdf(x, mu, sigma, a, b);
+
+    return pdf;
+}
+
+/******************************************************************************/
+double truncated_normal_rand (double mu, double sigma, double a, double b)
+{
+    int me = torc_i_worker_id();
+
+    double x = truncated_normal_ab_sample(mu, sigma, a, b, &local_seed[me]);
+
+    return x;
+}
+
+/******************************************************************************/
+double truncated_lognormal_pdf (double x, double mu, double sigma, double a, double b)
+{
+    double pdf;
+
+    pdf = log_normal_truncated_ab_pdf(x, mu, sigma, a, b);
+
+    return pdf;
+}
+

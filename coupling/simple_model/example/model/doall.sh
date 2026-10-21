@@ -3,7 +3,7 @@ ll=loglike.txt
 rr=result.txt
 
 
-module load python
+# module load python
 
 python   my_model.py   params.txt  data.dat
 
