@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+message: >-
+  If you use Pi4U in your research, please cite the original Pi4U framework
+  paper listed below. Please also cite relevant algorithm publications.
+title: 'Pi4U: Parallel Uncertainty Quantification and Optimization with TORC'
+type: software
+abstract: >-
+  Pi4U is a research software framework for Bayesian inference, uncertainty
+  quantification, and numerical optimization. It supports task-based parallel
+  evaluation of computational models using TORC on multicore systems and
+  distributed-memory clusters.
+authors:
+  - family-names: Hadjidoukas
+    given-names: Panagiotis E.
+  - family-names: Angelikopoulos
+    given-names: Panagiotis
+  - family-names: Papadimitriou
+    given-names: Costas
+  - family-names: Koumoutsakos
+    given-names: Petros
+  - family-names: Kulakova
+    given-names: Lina
+  - family-names: Arampatzis
+    given-names: Georgios
+repository-code: 'https://github.com/CEID-HPCLAB/pi4u'
+url: 'https://ceid-hpclab.github.io/pi4u/'
+keywords:
+  - high-performance computing
+  - parallel computing
+  - uncertainty quantification
+  - Bayesian inference
+  - numerical optimization
+  - TORC
+  - MPI
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Hadjidoukas
+      given-names: Panagiotis E.
+    - family-names: Angelikopoulos
+      given-names: Panagiotis
+    - family-names: Papadimitriou
+      given-names: Costas
+    - family-names: Koumoutsakos
+      given-names: Petros
+  title: 'Π4U: A high performance computing framework for Bayesian uncertainty quantification of complex models'
+  journal: Journal of Computational Physics
+  volume: '284'
+  start: '1'
+  end: '21'
+  year: 2015
+  doi: 10.1016/j.jcp.2014.12.006
