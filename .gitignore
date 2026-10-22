@@ -7,6 +7,8 @@
 tags
 
 *.txt
+!docs/requirements.txt
+
 # MkDocs build output and generated pages
 site/
 docs/generated/
