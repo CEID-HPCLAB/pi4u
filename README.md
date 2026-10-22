@@ -16,6 +16,13 @@ This repository is the home of the Pi4U continuation at **CEID-HPCLAB, Universit
 - **Support for scientific computing workflows.** Work with configurable algorithm engines, sample databases, numerical differentiation, and postprocessing tools.
 - **Extensible source code.** Adapt existing engines and coupling examples to new models and research problems.
 
+## Pi4U — Active Development
+
+This repository hosts the actively maintained continuation of Pi4U at CEID-HPCLAB, University of Patras, led by Dr. Panagiotis Hadjidoukas. It builds on the original Pi4U implementation developed at CSELAB, ETH Zurich, and extends its algorithms, portability, and TORC-based parallel execution capabilities.
+
+The original repository is preserved at cselab/pi4u for historical reference.
+
+
 ## Algorithms and capabilities
 
 The current source tree includes the following components. Parallel execution options and dependencies vary by engine; the DRAM implementation is sequential, and asynchronous CMA-ES is experimental.
