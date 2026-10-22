@@ -1,0 +1,77 @@
+site_name: Pi4U Documentation
+site_description: Parallel uncertainty quantification and optimization with TORC
+site_url: https://ceid-hpclab.github.io/pi4u/
+repo_url: https://github.com/CEID-HPCLAB/pi4u
+repo_name: CEID-HPCLAB/pi4u
+edit_uri: edit/main/docs/
+docs_dir: docs
+site_dir: site
+copyright: Pi4U contributors — University of Patras continuation
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: default
+      primary: light blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: light blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      permalink: true
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Concepts:
+      - TORC and Pi4U: architecture.md
+      - External model coupling: coupling.md
+  - Algorithms:
+      - Bayesian inference:
+          - TMCMC: generated/tmcmc.md
+          - DRAM: generated/dram.md
+          - ABC-SubSim: generated/abc-subsim.md
+      - Single-objective optimization:
+          - CMA-ES: generated/cmaes.md
+          - AMaLGaM: generated/amalgam.md
+      - Multiobjective optimization:
+          - NSGA-II: generated/nsga2.md
+          - MOEA/D: generated/moead.md
+          - MO-CMA-ES: generated/mocmaes.md
+      - Rare-event estimation: generated/subset.md
+  - External models: generated/external-coupling.md
+  - Tools:
+      - Numerical differentiation: generated/derivatives.md
+      - Model evaluation and sensitivity: generated/tools.md
+      - Postprocessing: generated/postprocessing.md
+      - Covariance analysis scripts: generated/covariance-scripts.md
+  - Project:
+      - References and history: references.md

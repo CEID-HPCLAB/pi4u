@@ -7,3 +7,6 @@
 tags
 
 *.txt
+# MkDocs build output and generated pages
+site/
+docs/generated/
